@@ -1,0 +1,7 @@
+"Supplier ID","Product Code","Product Description","Delivery Date","Unit Price","Number of Units"
+5,100,"Apples 1kg Golden Delicious","2012/05/12",1000,5
+5,100,"Apples 1kg Green","2012/05/12",1000,2
+5,100,"Apples 1kg Red","2012/05/12",1000,3
+5,207,"Bananas 1kg","2012/05/12",7000,4
+23,8754,"Milk 2l","2012/05/12",900,10
+54,8756,"1kg Mince Meat (Extra Lean)","2012/05/12",4500,8
