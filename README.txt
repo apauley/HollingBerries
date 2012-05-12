@@ -1,9 +1,13 @@
+Introduction
+============
 Meet Mr. Hollingberry. Recently retired, Mr. Hollingberry has decided
 to move to sunny South Africa and open up a local convenience store to
 keep him and Mrs. Hollingberry out of mischief.
 
 Alas, it turned out not be such a laid-back job as he had hoped...
 
+The Problem
+===========
 One of their current problems is printing price tags on their fresh produce.
 Every morning as soon, as the various produce have been delivered,
 Mrs. Hollingberry enters it into a program her nephew had written.
@@ -11,8 +15,17 @@ Mrs. Hollingberry enters it into a program her nephew had written.
 The result is a comma-seperated file that includes, among other
 fields, the cost price (in cents) and delivery date of each product.
 
-Your job is to write a program that reads this file and then creates
+The Task
+========
+Your job is to write a program that reads the csv file and then creates
 a new file that will be used to print out the price tags.
+
+The Input File
+===============
+An example csv file is in this directory.
+
+The Output File
+===============
 The price file has 3 fields on each line: the selling price, the
 sell-by date and a product description.
 
@@ -31,11 +44,13 @@ The remaining 22 characters is used for the product description.
 A typical line in the price file will look like this:
 R  17.952012/05/19Apples 1kg Golden Deli
 
+The Business Rules
+==================
 You have to calculate the selling price and the sell-by date. Luckily
 we can use the description just as it is in the csv file.
 
-The markup for apples golden delicious apples is 75%.
-The markup for apples both red and green apples is 70%.
+The markup for golden delicious apples is 75%.
+The markup for both red and green apples is 70%.
 The markup for bananas is 85%.
 The markup for milk is 20%.
 The markup for meat is 25%.
@@ -47,3 +62,12 @@ delivery.
 
 Milk has to be sold 2 days after the date of delivery.
 Meat has to be sold 1 week after the date of delivery.
+
+Fruit has product codes ranging from 1000 to 1999.
+Apples specifically have product codes ranging from 1100 to 1199.
+Bananas have product codes ranging from 1200 to 1299.
+
+Diary products have product codes ranging from 2000 to 3999.
+Milk, specifically, have product codes ranging from 2100 to 2199.
+
+Meat has product codes ranging from 4000 to 7999.
