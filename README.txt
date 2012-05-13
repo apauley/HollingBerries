@@ -36,7 +36,7 @@ The price file has 3 fields on each line: the selling price, the
 sell-by date and a product description.
 
 The price file is in fixed-width format, because the label printer has
-limited space (40 characters) for each price tag. Each line in the price file will
+limited space (50 characters) for each price tag. Each line in the price file will
 cause one price tag to be printed.
 
 The selling price takes up 9 characters. One currency symbol (R) and 8
@@ -48,16 +48,16 @@ he can't take that kind of stress again.
 The sell-by date, just like the delivery date in the input file, is in
 YYYY/MM/DD format (10 characters).
 
-The remaining 21 characters is used for the product description.
+The remaining 31 characters is used for the product description.
 
 A typical line in the price file will look like this:
-R   21.072012-05-12Apples 1kg Golden Del
+R   19.922012/05/26Apples 1kg Green. They are very
 
 The Business Rules
 ==================
 You have to calculate the selling price and the sell-by date. Luckily
 we can use the description just as it is in the csv file. Well, the
-first 21 characters of it anyway.
+first 31 characters of it anyway.
 
 The markup for apples  is 40%.
 The markup for bananas is 35%.

@@ -49,7 +49,7 @@ class Product
   end
 
   def label_description
-    @description[0, 21]
+    @description[0, 31]
   end
   
   def write_pricefile(file)
