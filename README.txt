@@ -1,7 +1,7 @@
 Introduction
 ============
-Meet Mr. Hollingberry. Recently retired, Mr. Hollingberry has decided
-to move to sunny South Africa and open up a local convenience store to
+Meet Mr. and Mrs. Hollingberry. Recently retired, Mr. Hollingberry has decided
+to move to sunny South Africa and open up a small local convenience store to
 keep him and Mrs. Hollingberry out of mischief.
 
 Alas, it turned out not be such a laid-back job as he had hoped...
@@ -23,6 +23,12 @@ a new file that will be used to print out the price tags.
 The Input File
 ===============
 An example csv file is in this directory.
+We use the following fields:
+    Product code. This tells us what kind of produce we're dealing with.
+    Description. We can print part of this on the price tag.
+    Delivery date. YYYY-MM-DD. We use this to calculate the sell-by date.
+    Cost price. In cents.
+    Unit count. We need to print a price tag for each item delivered.
 
 The Output File
 ===============
@@ -30,44 +36,40 @@ The price file has 3 fields on each line: the selling price, the
 sell-by date and a product description.
 
 The price file is in fixed-width format, because the label printer has
-limited space for each price tag. Each line in the price file will
+limited space (40 characters) for each price tag. Each line in the price file will
 cause one price tag to be printed.
 
-The selling price takes up 8 characters. One currency symbol (R) and 7
-digits where Rands and cents are seperated by a period: R9999.99
+The selling price takes up 9 characters. One currency symbol (R) and 8
+digits where Rands and cents are seperated by a period: R99999.99
+Mr Hollingberry says we shouldn't worry about larger amounts. If he
+ever sells something for a 100 grand he will have to retire again, and
+he can't take that kind of stress again.
 
 The sell-by date, just like the delivery date in the input file, is in
 YYYY/MM/DD format (10 characters).
 
-The remaining 22 characters is used for the product description.
+The remaining 21 characters is used for the product description.
 
 A typical line in the price file will look like this:
-R  17.952012/05/19Apples 1kg Golden Deli
+R   16.872012/05/12Apples 1kg Golden Del
 
 The Business Rules
 ==================
 You have to calculate the selling price and the sell-by date. Luckily
-we can use the description just as it is in the csv file.
+we can use the description just as it is in the csv file. Well, the
+first 21 characters of it anyway.
 
-The markup for golden delicious apples is 75%.
-The markup for both red and green apples is 70%.
-The markup for bananas is 85%.
-The markup for milk is 20%.
-The markup for meat is 25%.
+The markup for apples  is 40%.
+The markup for bananas is 70%.
+The markup for berries is 55%.
+The markup for anything else 50%.
 
 Apples have to be sold 2 weeks after the date of delivery.
 Bananas have to be sold 5 days after the date of delivery.
 All other types of fruit has to be sold 1 week after the date of
 delivery.
 
-Milk has to be sold 2 days after the date of delivery.
-Meat has to be sold 1 week after the date of delivery.
-
 Fruit has product codes ranging from 1000 to 1999.
 Apples specifically have product codes ranging from 1100 to 1199.
 Bananas have product codes ranging from 1200 to 1299.
-
-Diary products have product codes ranging from 2000 to 3999.
-Milk, specifically, have product codes ranging from 2100 to 2199.
-
-Meat has product codes ranging from 4000 to 7999.
+Berries have product codes ranging from 1300 to 1399.

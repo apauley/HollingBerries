@@ -6,15 +6,45 @@ class Product
   def self.create(product_code, description, delivery_date, cost_price, unit_count)
     if product_code >= 1000 and product_code <= 1999
       Fruit.create(product_code, description, delivery_date, cost_price, unit_count)
-    elsif product_code >= 2000 and product_code <= 3999
-      DairyProduct.create(product_code, description, delivery_date, cost_price, unit_count)
-    elsif product_code >= 4000 and product_code <= 7999
-      Meat.create(product_code, description, delivery_date, cost_price, unit_count)
     else
       raise "Bad product code: #{product_code} #{description}"
     end
   end
+  
   def initialize(product_code, description, delivery_date, cost_price, unit_count)
+    @product_code  = product_code
+    @description   = description
+    @delivery_date = delivery_date
+    @cost_price    = cost_price
+    @unit_count    = unit_count
+  end
+
+  def markup_percentage
+    50
+  end
+
+  def markup
+    @cost_price*(markup_percentage/100.0)
+  end
+
+  def sell_price_in_rands
+    (@cost_price + markup)/100.0
+  end
+
+  def label_sell_price
+    'R' + "% 8.2f" % sell_price_in_rands
+  end
+
+  def label_sell_by_date
+    @delivery_date[0, 10]
+  end
+
+  def label_description
+    @description[0, 21]
+  end
+  
+  def write_pricefile(file)
+    @unit_count.times {file.puts label_sell_price + label_sell_by_date + label_description}
   end
 end
 
@@ -24,6 +54,8 @@ class Fruit < Product
       Apple.new(product_code, description, delivery_date, cost_price, unit_count)
     elsif product_code >= 1200 and product_code <= 1299
       Banana.new(product_code, description, delivery_date, cost_price, unit_count)
+    elsif product_code >= 1300 and product_code <= 1399
+      Berry.new(product_code, description, delivery_date, cost_price, unit_count)
     else
       raise "Bad Fruit product code: #{product_code} #{description}" 
     end
@@ -31,51 +63,46 @@ class Fruit < Product
 end
 
 class Apple < Fruit
+  def markup_percentage
+    40
+  end
 end
+
 class Banana < Fruit
-end
-
-class DairyProduct < Product
-  def self.create(product_code, description, delivery_date, cost_price, unit_count)
-    if product_code >= 2100 and product_code <= 2199
-      Milk.new(product_code, description, delivery_date, cost_price, unit_count)
-    else
-      raise "Bad dairy product code: #{product_code} #{description}"
-    end
+  def markup_percentage
+    70
   end
 end
 
-class Milk < DairyProduct
-end
-
-class Meat < Product
-  def self.create(product_code, description, delivery_date, cost_price, unit_count)
-    MinceMeat.new(product_code, description, delivery_date, cost_price, unit_count)
+class Berry < Fruit
+  def markup_percentage
+    55
   end
 end
 
-class MinceMeat < Meat
-end
 
-def to_price_file(line)
+def to_price_file(line, file)
   CSV.parse(line) do |row|
     product_code  = Integer(row[1])
     description   = row[2]
     delivery_date = row[3]
     cost_price    = Integer(row[4])
     unit_count    = Integer(row[5])
-    prod = Product.create(product_code, description, delivery_date, cost_price, unit_count)
-    puts prod
-    puts
+    product = Product.create(product_code, description, delivery_date, cost_price, unit_count)
+    puts product
+    product.write_pricefile(file)
   end
 end
 
+def main()
+  inputfile  = File.new('../produce.csv', 'r')
+  outputfile = File.new('pricefile.txt', 'w')
 
-filename = '../produce.csv'
-file = File.new(filename, 'r')
-
-file.each_line("\n") do |row|
-  if file.lineno > 1
-    to_price_file(row)
+  inputfile.each_line("\n") do |line|
+    if inputfile.lineno > 1
+      to_price_file(line, outputfile)
+    end
   end
 end
+
+main()
