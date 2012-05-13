@@ -81,5 +81,6 @@ write_pricefile(Product, OutputFile) ->
   LabelSellByDate  = Product#product.delivery_date,
   LabelDescription = string:substr(Product#product.description, 1, 31),
   Line = LabelSellPrice ++ LabelSellByDate ++ LabelDescription ++ "\n",
-  ok = file:write(OutputFile, Line),
+  Lines = [Line || _Count <- lists:seq(1,Product#product.unit_count)],
+  ok = file:write(OutputFile, Lines),
   ok.
