@@ -22,7 +22,7 @@ a new file that will be used to print out the price tags.
 
 The Input File
 ===============
-An example csv file is in this directory.
+An example csv file is in this directory (produce.csv).
 We use the following fields:
     Product code. This tells us what kind of produce we're dealing with.
     Description. We can print part of this on the price tag.
@@ -32,6 +32,7 @@ We use the following fields:
 
 The Output File
 ===============
+An example output file generated from the example input file is in this directory (pricefile.txt).
 The price file has 3 fields on each line: the selling price, the
 sell-by date and a product description.
 
