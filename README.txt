@@ -51,7 +51,7 @@ YYYY/MM/DD format (10 characters).
 The remaining 21 characters is used for the product description.
 
 A typical line in the price file will look like this:
-R   16.872012/05/12Apples 1kg Golden Del
+R   21.072012-05-12Apples 1kg Golden Del
 
 The Business Rules
 ==================
@@ -60,7 +60,7 @@ we can use the description just as it is in the csv file. Well, the
 first 21 characters of it anyway.
 
 The markup for apples  is 40%.
-The markup for bananas is 70%.
+The markup for bananas is 35%.
 The markup for berries is 55%.
 The markup for anything else 50%.
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'csv'
+require 'date'
 
 class Product
   def self.create(product_code, description, delivery_date, cost_price, unit_count)
@@ -17,6 +18,14 @@ class Product
     @delivery_date = delivery_date
     @cost_price    = cost_price
     @unit_count    = unit_count
+  end
+
+  def shelf_days
+    7
+  end
+
+  def sell_by_date
+    @delivery_date + shelf_days
   end
 
   def markup_percentage
@@ -36,7 +45,7 @@ class Product
   end
 
   def label_sell_by_date
-    @delivery_date[0, 10]
+    sell_by_date.strftime('%Y/%m/%d')
   end
 
   def label_description
@@ -66,11 +75,17 @@ class Apple < Fruit
   def markup_percentage
     40
   end
+  def shelf_days
+    14
+  end
 end
 
 class Banana < Fruit
   def markup_percentage
-    70
+    35
+  end
+  def shelf_days
+    5
   end
 end
 
@@ -85,11 +100,10 @@ def to_price_file(line, file)
   CSV.parse(line) do |row|
     product_code  = Integer(row[1])
     description   = row[2]
-    delivery_date = row[3]
+    delivery_date = Date.parse(row[3])
     cost_price    = Integer(row[4])
     unit_count    = Integer(row[5])
     product = Product.create(product_code, description, delivery_date, cost_price, unit_count)
-    puts product
     product.write_pricefile(file)
   end
 end
