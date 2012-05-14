@@ -35,7 +35,7 @@ to_price_file(Line, OutputFile) ->
   Fields = csv:parse_line(Line),
   [SupplierID, ProductCode, Description, DeliveryDate, CostPrice, UnitCount] = Fields,
   Product = calculate_product(list_to_integer(SupplierID),list_to_integer(ProductCode),
-                              Description, parse_date(DeliveryDate),
+                              Description, date_utils:parse_date(DeliveryDate),
                               list_to_integer(CostPrice), list_to_integer(UnitCount)),
   ok = write_pricefile(Product, OutputFile),
   ok.
@@ -50,7 +50,7 @@ sell_price(ProductType, CostPrice) ->
   CostPrice + markup(ProductType, CostPrice).
 
 sell_by_date(ProductType, SupplierID, DeliveryDate) ->
-  date_add_days(DeliveryDate, shelf_days(SupplierID, ProductType)).
+  date_utils:date_add_days(DeliveryDate, shelf_days(SupplierID, ProductType)).
 
 simple_product(SupplierID, ProductCode, Description, DeliveryDate, CostPrice, UnitCount) ->
   #product{product_type  = product_type(ProductCode),
@@ -86,27 +86,11 @@ product_type(ProductCode) when ((ProductCode >= 1200) and (ProductCode =< 1299))
 product_type(ProductCode) when ((ProductCode >= 1300) and (ProductCode =< 1399)) ->
   berry.
 
-date_add_days(Date, Days) ->
-  GregDays = calendar:date_to_gregorian_days(Date),
-  calendar:gregorian_days_to_date(GregDays+Days).
-
-parse_date(DateString) ->
-  Tokens = string:tokens(DateString, "/"),
-  [Year, Month, Day] = [list_to_integer(Str) || Str <- Tokens],
-  {Year, Month, Day}.
-
-date_to_string(Date) ->
-  {Y, M, D} = Date,
-  Year  = string:right(integer_to_list(Y), 4, $0),
-  Month = string:right(integer_to_list(M), 2, $0),
-  Day   = string:right(integer_to_list(D), 2, $0),
-  io_lib:format("~s/~s/~s", [Year,Month,Day]).
-
 write_pricefile(Product, OutputFile) ->
   SellPriceRands   = io_lib:format("~.2f", [Product#product.sell_price/100]),
   [SpaceChar] = " ",
   LabelSellPrice   = "R"++ string:right(SellPriceRands, 4, SpaceChar),
-  LabelSellByDate  = date_to_string(Product#product.sell_by_date),
+  LabelSellByDate  = date_utils:date_to_string(Product#product.sell_by_date),
   LabelDescription = string:substr(Product#product.description, 1, 31),
   Line = LabelSellPrice ++ LabelSellByDate ++ LabelDescription ++ "\n",
   Lines = [Line || _Count <- lists:seq(1,Product#product.unit_count)],
