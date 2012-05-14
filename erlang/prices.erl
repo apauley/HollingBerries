@@ -4,6 +4,7 @@
 
 -record(product, {product_type,
                   product_code,
+                  supplier_id,
                   description,
                   delivery_date,
                   cost_price,
@@ -32,27 +33,29 @@ process_file(InputFile, OutputFile, Line) ->
 
 to_price_file(Line, OutputFile) ->
   Fields = csv:parse_line(Line),
-  [_SupplierID, ProductCode, Description, DeliveryDate, CostPrice, UnitCount] = Fields,
-  Product = calculate_product(list_to_integer(ProductCode), Description, parse_date(DeliveryDate),
+  [SupplierID, ProductCode, Description, DeliveryDate, CostPrice, UnitCount] = Fields,
+  Product = calculate_product(list_to_integer(SupplierID),list_to_integer(ProductCode),
+                              Description, parse_date(DeliveryDate),
                               list_to_integer(CostPrice), list_to_integer(UnitCount)),
   ok = write_pricefile(Product, OutputFile),
   ok.
 
-calculate_product(ProductCode, Description, DeliveryDate, CostPrice, UnitCount) ->
-  Product    = simple_product(ProductCode, Description, DeliveryDate, CostPrice, UnitCount),
+calculate_product(SupplierID, ProductCode, Description, DeliveryDate, CostPrice, UnitCount) ->
+  Product    = simple_product(SupplierID, ProductCode, Description, DeliveryDate, CostPrice, UnitCount),
   SellPrice  = sell_price(Product#product.product_type, CostPrice),
-  SellByDate = sell_by_date(Product#product.product_type, DeliveryDate),
+  SellByDate = sell_by_date(Product#product.product_type, SupplierID, DeliveryDate),
   Product#product{sell_price = SellPrice, sell_by_date=SellByDate}.
 
 sell_price(ProductType, CostPrice) ->
   CostPrice + markup(ProductType, CostPrice).
 
-sell_by_date(ProductType, DeliveryDate) ->
-  date_add_days(DeliveryDate, shelf_days(ProductType)).
+sell_by_date(ProductType, SupplierID, DeliveryDate) ->
+  date_add_days(DeliveryDate, shelf_days(SupplierID, ProductType)).
 
-simple_product(ProductCode, Description, DeliveryDate, CostPrice, UnitCount) ->
+simple_product(SupplierID, ProductCode, Description, DeliveryDate, CostPrice, UnitCount) ->
   #product{product_type  = product_type(ProductCode),
            product_code  = ProductCode,
+           supplier_id   = SupplierID,
            description   = Description,
            delivery_date = DeliveryDate,
            cost_price    = CostPrice,
@@ -66,6 +69,11 @@ markup(berry, CostPrice) ->
   CostPrice * (55/100.0);
 markup(_ProductType, CostPrice) ->
   CostPrice * (50/100.0).
+
+shelf_days(32, ProductType) ->
+  shelf_days(ProductType) - 3;
+shelf_days(_SupplierID, ProductType) ->
+  shelf_days(ProductType).
 
 shelf_days(apple)        -> 14;
 shelf_days(banana)       -> 5;

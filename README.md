@@ -89,6 +89,12 @@ Bananas have to be sold 5 days after the date of delivery.
 All other types of fruit has to be sold 1 week after the date of
 delivery.
 
+One the suppliers, Susan Windler (Supplier ID 32), has been known to deliver
+fruit that is not quite as fresh as that of the other suppliers.
+Mr. Hollingberry has decided to handle this quietly, by ensuring that
+the sell-by date for anything delivered by Susan is always 3
+days earlier than normal.
+
 Fruit has product codes ranging from 1000 to 1999.
 Apples specifically have product codes ranging from 1100 to 1199.
 Bananas have product codes ranging from 1200 to 1299.

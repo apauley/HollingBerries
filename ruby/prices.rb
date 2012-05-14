@@ -4,15 +4,16 @@ require 'csv'
 require 'date'
 
 class Product
-  def self.create(product_code, description, delivery_date, cost_price, unit_count)
+  def self.create(supplier_id, product_code, description, delivery_date, cost_price, unit_count)
     if product_code >= 1000 and product_code <= 1999
-      Fruit.create(product_code, description, delivery_date, cost_price, unit_count)
+      Fruit.create(supplier_id, product_code, description, delivery_date, cost_price, unit_count)
     else
       raise "Bad product code: #{product_code} #{description}"
     end
   end
   
-  def initialize(product_code, description, delivery_date, cost_price, unit_count)
+  def initialize(supplier_id, product_code, description, delivery_date, cost_price, unit_count)
+    @supplier_id   = supplier_id
     @product_code  = product_code
     @description   = description
     @delivery_date = delivery_date
@@ -25,7 +26,12 @@ class Product
   end
 
   def sell_by_date
-    @delivery_date + shelf_days
+    if @supplier_id == 32
+      days_to_add = shelf_days - 3
+    else
+      days_to_add = shelf_days
+    end
+    @delivery_date + days_to_add
   end
 
   def markup_percentage
@@ -58,13 +64,13 @@ class Product
 end
 
 class Fruit < Product
-  def self.create(product_code, description, delivery_date, cost_price, unit_count)
+  def self.create(supplier_id, product_code, description, delivery_date, cost_price, unit_count)
     if product_code >= 1100 and product_code <= 1199
-      Apple.new(product_code, description, delivery_date, cost_price, unit_count)
+      Apple.new(supplier_id, product_code, description, delivery_date, cost_price, unit_count)
     elsif product_code >= 1200 and product_code <= 1299
-      Banana.new(product_code, description, delivery_date, cost_price, unit_count)
+      Banana.new(supplier_id, product_code, description, delivery_date, cost_price, unit_count)
     elsif product_code >= 1300 and product_code <= 1399
-      Berry.new(product_code, description, delivery_date, cost_price, unit_count)
+      Berry.new(supplier_id, product_code, description, delivery_date, cost_price, unit_count)
     else
       raise "Bad Fruit product code: #{product_code} #{description}" 
     end
@@ -98,12 +104,13 @@ end
 
 def to_price_file(line, file)
   CSV.parse(line) do |row|
+    supplier_id   = Integer(row[0])
     product_code  = Integer(row[1])
     description   = row[2]
     delivery_date = Date.parse(row[3])
     cost_price    = Integer(row[4])
     unit_count    = Integer(row[5])
-    product = Product.create(product_code, description, delivery_date, cost_price, unit_count)
+    product = Product.create(supplier_id, product_code, description, delivery_date, cost_price, unit_count)
     product.write_pricefile(file)
   end
 end
