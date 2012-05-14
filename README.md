@@ -26,16 +26,27 @@ An example csv file is in this directory (produce.csv).
 We use the following fields:
 
 *   Supplier ID.
+
     All suppliers are equal, but some are more equal than others.
+
 *   Product code.
+
     This tells us what kind of produce we're dealing with.
+
 *   Description.
+
     We can print part of this on the price tag.
+
 *   Delivery date.
+
     YYYY-MM-DD. We use this to calculate the sell-by date.
+
 *   Cost price.
+
     In cents.
+
 *   Unit count.
+
     We need to print a price tag for each item delivered.
 
 The Output File
