@@ -13,4 +13,4 @@ How to run this Erlang version
 
 *   Run prices:start().
 
-    > > prices:start().
+    > \> prices:start().
