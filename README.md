@@ -61,6 +61,7 @@ cause one price tag to be printed.
 
 The selling price takes up 9 characters. One currency symbol (R) and 8
 digits where Rands and cents are seperated by a period: R99999.99
+
 Mr Hollingberry says we shouldn't worry about larger amounts. If he
 ever sells something for a 100 grand he will have to retire again, and
 he can't take that kind of stress again.
