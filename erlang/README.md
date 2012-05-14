@@ -14,3 +14,5 @@ How to run this Erlang version
 *   Run prices:start().
 
     > \> prices:start().
+
+*   Look at the contents of pricefile.txt
