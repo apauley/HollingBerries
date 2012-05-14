@@ -79,14 +79,16 @@ You have to calculate the selling price and the sell-by date. Luckily
 we can use the description just as it is in the csv file. Well, the
 first 31 characters of it anyway.
 
-The markup for apples  is 40%.
-The markup for bananas is 35%.
-The markup for berries is 55%.
-The markup for anything else 50%.
+### Markup Rules
+* The markup for apples  is 40%.
+* The markup for bananas is 35%.
+* The markup for berries is 55%.
+* The markup for anything else 50%.
 
-Apples have to be sold 2 weeks after the date of delivery.
-Bananas have to be sold 5 days after the date of delivery.
-All other types of fruit has to be sold 1 week after the date of
+### Sell-by Dates
+* Apples have to be sold 2 weeks after the date of delivery.
+* Bananas have to be sold 5 days after the date of delivery.
+* All other types of fruit has to be sold 1 week after the date of
 delivery.
 
 One the suppliers, Susan Windler (Supplier ID 32), has been known to deliver
@@ -95,7 +97,8 @@ Mr. Hollingberry has decided to handle this quietly, by ensuring that
 the sell-by date for anything delivered by Susan is always 3
 days earlier than normal.
 
-Fruit has product codes ranging from 1000 to 1999.
-Apples specifically have product codes ranging from 1100 to 1199.
-Bananas have product codes ranging from 1200 to 1299.
-Berries have product codes ranging from 1300 to 1399.
+### Product Codes
+* Fruit has product codes ranging from 1000 to 1999.
+* Apples specifically have product codes ranging from 1100 to 1199.
+* Bananas have product codes ranging from 1200 to 1299.
+* Berries have product codes ranging from 1300 to 1399.
