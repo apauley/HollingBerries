@@ -103,3 +103,28 @@ days earlier than normal.
 * Apples specifically have product codes ranging from 1100 to 1199.
 * Bananas have product codes ranging from 1200 to 1299.
 * Berries have product codes ranging from 1300 to 1399.
+
+How do I contribute my solution?
+================================
+
+*   Fork https://github.com/apauley/HollingBerries on github.
+
+*   Make a subdirectory for your language, if it isn't already there
+
+*   Put your code in a subdirectory named with your github username
+
+    > eg. ocaml/yminsky
+
+*   If you have multiple solutions in the same language, put a
+    -description after your github username
+
+    > eg. ruby/apauley-functionalruby
+
+*   Make sure that your solution generates exactly the same output
+    file when given the sample input file:
+
+    > $ diff -u pricefile.txt ../../pricefile.txt # Expect no output
+
+*   Include a README file with instructions on how to build/run your
+    code. A Makefile or something similar will be nice. Also, tell us
+    a bit about your solution if you feel like it.
