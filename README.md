@@ -115,8 +115,7 @@ How do I contribute my solution?
 
     > eg. ocaml/yminsky
 
-*   If you have multiple solutions in the same language, put a
-    -description after your github username
+*   If you want, put a description after your github username
 
     > eg. ruby/apauley-functionalruby
 
