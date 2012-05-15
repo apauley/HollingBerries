@@ -116,7 +116,7 @@ def to_price_file(line, file)
 end
 
 def main()
-  inputfile  = File.new('../produce.csv', 'r')
+  inputfile  = File.new('../../produce.csv', 'r')
   outputfile = File.new('pricefile.txt', 'w')
 
   inputfile.each_line("\n") do |line|

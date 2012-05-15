@@ -13,7 +13,7 @@
                   sell_by_date}).
 
 start() ->
-  {ok, InputFile}  = file:open("../produce.csv", [read]),
+  {ok, InputFile}  = file:open("../../produce.csv", [read]),
   {ok, OutputFile} = file:open("pricefile.txt", [write]),
   {ok, _Header} = file:read_line(InputFile),
   ok = process_file(InputFile, OutputFile),
