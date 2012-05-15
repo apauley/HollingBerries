@@ -9,7 +9,7 @@ Alas, it turned out not be such a laid-back job as he had hoped...
 The Problem
 ===========
 One of their current problems is printing price tags on their fresh produce.
-Every morning as soon, as the various produce have been delivered,
+Every morning, as soon as the various produce have been delivered,
 Mrs. Hollingberry enters it into a program her nephew had written.
 
 The result is a comma-seperated file that includes, among other
@@ -43,7 +43,7 @@ We use the following fields:
 
 *   Cost price.
 
-    In cents.
+    In cents. We use this to calculate the selling price.
 
 *   Unit count.
 
@@ -52,8 +52,8 @@ We use the following fields:
 The Output File
 ===============
 An example output file generated from the example input file is in this directory (pricefile.txt).
-The price file has 3 fields on each line: the selling price, the
-sell-by date and a product description.
+The price file has 3 fields on each line:
+the selling price, the sell-by date and a product description.
 
 The price file is in fixed-width format, because the label printer has
 limited space (50 characters) for each price tag. Each line in the price file will
@@ -72,7 +72,8 @@ YYYY/MM/DD format (10 characters).
 The remaining 31 characters is used for the product description.
 
 A typical line in the price file will look like this:
-R   19.922012/05/26Apples 1kg Green. They are very
+
+> R   19.922012/05/26Apples 1kg Green. They are very
 
 The Business Rules
 ==================
@@ -127,3 +128,9 @@ How do I contribute my solution?
 *   Include a README file with instructions on how to build/run your
     code. A Makefile or something similar will be nice. Also, tell us
     a bit about your solution if you feel like it.
+
+*   Send me a pull request so that your solution is included with the
+    others. By doing this you agree that your code may be used by
+    anyone for any purpose. If you use someone elses code it will be
+    nice to give him/her credit. Email me if you have a suggestion for an informal
+    license that fits these code comparisons. MIT? Creative Commons?
