@@ -20,6 +20,12 @@ Or start a repl (is it called a prompt in Python?)
 To run the test:
 > lein test
 
+UPDATE:
+I wasn't quite happy with first version and have done a second, which
+is now available in the namespace 'berry.second - it's slightly shorter
+and data is nicely separated from the program.
+
+
 ## License
 
 Distributed under the Eclipse Public License, the same as Clojure.

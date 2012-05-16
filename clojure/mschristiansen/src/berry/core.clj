@@ -97,13 +97,11 @@
   "Concatenate the strings together and add end-of-line."
   [item]
   (let [tags (lookup-number item 5)]
-    (reduce str
-            (repeat tags
-                    (str (calculate-price item)
-                         (calculate-sell-by-date item)
-                         (include-description item)
-                         "\n")))))
+    (repeat tags
+            (str (calculate-price item)
+                 (calculate-sell-by-date item)
+                 (include-description item)
+                 "\n"))))
 
 (defn -main []
-  (spit out-file (doall (reduce str (map create-tags items)))))
-
+  (spit out-file (doall (reduce str (mapcat create-tags items)))))

@@ -9,3 +9,4 @@ pom.xml
 .lein-failures
 .lein-plugins
 pricefile.txt
+pricefile2.txt
