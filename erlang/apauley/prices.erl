@@ -1,6 +1,6 @@
 -module(prices).
 
--export([start/0]).
+-export([start/0,test/0]).
 
 -record(product, {product_type,
                   product_code,
@@ -86,13 +86,32 @@ product_type(ProductCode) when ((ProductCode >= 1200) and (ProductCode =< 1299))
 product_type(ProductCode) when ((ProductCode >= 1300) and (ProductCode =< 1399)) ->
   berry.
 
+label_sell_price(SellPriceCents) when is_float(SellPriceCents) ->
+  label_sell_price(round(SellPriceCents));
+label_sell_price(SellPriceCents) when is_integer(SellPriceCents) ->
+  RandsPart = io_lib:format("~5.. B", [trunc(SellPriceCents/100)]),
+  CentsPart = io_lib:format("~2..0B", [SellPriceCents rem 100]),
+  "R"++ lists:flatten(RandsPart ++ "." ++ CentsPart).
+
 write_pricefile(Product, OutputFile) ->
-  SellPriceRands   = io_lib:format("~.2f", [Product#product.sell_price/100]),
-  [SpaceChar] = " ",
-  LabelSellPrice   = "R"++ string:right(SellPriceRands, 4, SpaceChar),
+  LabelSellPrice = label_sell_price(Product#product.sell_price),
   LabelSellByDate  = date_utils:date_to_string(Product#product.sell_by_date),
   LabelDescription = string:substr(Product#product.description, 1, 31),
   Line = LabelSellPrice ++ LabelSellByDate ++ LabelDescription ++ "\n",
   Lines = [Line || _Count <- lists:seq(1,Product#product.unit_count)],
-  ok = file:write(OutputFile, Lines),
+  ok = file:write(OutputFile, Lines).
+
+test() ->
+  %% http://armstrongonsoftware.blogspot.com/2009/01/micro-lightweight-unit-testing.html
+  test_label_sell_price().
+
+test_label_sell_price() ->
+  "R   17.23" = label_sell_price(_Cents=1723),
+  "R   17.24" = label_sell_price(1723.94), %% Let's round fractions of cents
+  "R  123.04" = label_sell_price(12304),
+  "R99999.99" = label_sell_price(9999999),
+  "R    1.23" = label_sell_price(123),
+  "R    1.20" = label_sell_price(120),
+  "R    0.23" = label_sell_price(23),
+  "R    0.00" = label_sell_price(0),
   ok.
