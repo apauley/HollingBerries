@@ -12,6 +12,9 @@
                   sell_price,
                   sell_by_date}).
 
+-define(PREMIUM_SUPPLIER_IDS, [204,219]).
+-define(UNFRESH_SUPPLIER_IDS, [32,101]).
+
 start() ->
   {ok, InputFile}  = file:open("../../produce.csv", [read]),
   {ok, OutputFile} = file:open("pricefile.txt", [write]),
@@ -42,12 +45,34 @@ to_price_file(Line, OutputFile) ->
 
 calculate_product(SupplierID, ProductCode, Description, DeliveryDate, CostPrice, UnitCount) ->
   Product    = simple_product(SupplierID, ProductCode, Description, DeliveryDate, CostPrice, UnitCount),
-  SellPrice  = sell_price(Product#product.product_type, CostPrice),
+  SellPrice  = sell_price(Product#product.product_type, SupplierID, CostPrice),
   SellByDate = sell_by_date(Product#product.product_type, SupplierID, DeliveryDate),
   Product#product{sell_price = SellPrice, sell_by_date=SellByDate}.
 
-sell_price(ProductType, CostPrice) ->
-  CostPrice + markup(ProductType, CostPrice).
+sell_price(ProductType, SupplierID, CostPrice) ->
+  Cents = round(CostPrice + markup_cents(ProductType, SupplierID, CostPrice)),
+  price_with_modifications(Cents, SupplierID).
+
+price_with_modifications(BasePriceCents, SupplierID) ->
+  MarkupCents1 = case lists:member(SupplierID, ?PREMIUM_SUPPLIER_IDS) of
+                   true  -> cents_rounded_up_to_nearest_rand(BasePriceCents);
+                   false -> BasePriceCents
+                 end,
+  MarkupCents2 = case lists:member(SupplierID, ?UNFRESH_SUPPLIER_IDS) of
+                   true  -> MarkupCents1 - 200; % R2 discount
+                   false -> MarkupCents1
+                 end,
+  max(0, MarkupCents2).
+
+cents_rounded_up_to_nearest_rand(Cents) when is_integer(Cents) ->
+  RandsPart = trunc(Cents/100),
+  CentsPart = Cents rem 100,
+  cents_rounded_up_to_nearest_rand(RandsPart, CentsPart).
+
+cents_rounded_up_to_nearest_rand(RandsPart, _CentsPart=0) ->
+  RandsPart * 100;
+cents_rounded_up_to_nearest_rand(RandsPart, _CentsPart) ->
+  (RandsPart + 1) * 100.
 
 sell_by_date(ProductType, SupplierID, DeliveryDate) ->
   date_utils:date_add_days(DeliveryDate, shelf_days(SupplierID, ProductType)).
@@ -61,16 +86,29 @@ simple_product(SupplierID, ProductCode, Description, DeliveryDate, CostPrice, Un
            cost_price    = CostPrice,
            unit_count    = UnitCount}.
 
-markup(apple, CostPrice) ->
-  CostPrice * (40/100.0);
-markup(banana, CostPrice) ->
-  CostPrice * (35/100.0);
-markup(berry, CostPrice) ->
-  CostPrice * (55/100.0);
-markup(_ProductType, CostPrice) ->
-  CostPrice * (50/100.0).
+markup_cents(ProductType, SupplierID, CostPrice) ->
+  Percentage = markup_percentage(ProductType, SupplierID),
+  CostPrice * (Percentage/100.0).
 
-shelf_days(32, ProductType) ->
+markup_percentage(ProductType, SupplierID) ->
+  markup_percentage(ProductType) + supplier_markup_percentage_modification(SupplierID).
+
+markup_percentage(apple) ->
+  40;
+markup_percentage(banana) ->
+  35;
+markup_percentage(berry) ->
+  55;
+markup_percentage(_ProductType) ->
+  50.
+
+supplier_markup_percentage_modification(SupplierID) ->
+  case lists:member(SupplierID, ?PREMIUM_SUPPLIER_IDS) of
+    true  -> 10;
+    false -> 0
+  end.
+
+shelf_days(_SupplierID=32, ProductType) ->
   shelf_days(ProductType) - 3;
 shelf_days(_SupplierID, ProductType) ->
   shelf_days(ProductType).
@@ -86,8 +124,6 @@ product_type(ProductCode) when ((ProductCode >= 1200) and (ProductCode =< 1299))
 product_type(ProductCode) when ((ProductCode >= 1300) and (ProductCode =< 1399)) ->
   berry.
 
-label_sell_price(SellPriceCents) when is_float(SellPriceCents) ->
-  label_sell_price(round(SellPriceCents));
 label_sell_price(SellPriceCents) when is_integer(SellPriceCents) ->
   RandsPart = io_lib:format("~5.. B", [trunc(SellPriceCents/100)]),
   CentsPart = io_lib:format("~2..0B", [SellPriceCents rem 100]),
@@ -103,15 +139,40 @@ write_pricefile(Product, OutputFile) ->
 
 test() ->
   %% http://armstrongonsoftware.blogspot.com/2009/01/micro-lightweight-unit-testing.html
-  test_label_sell_price().
+  test_sell_price(),
+  test_sell_price_premium_supplier(),
+  test_sell_price_unfresh_supplier(),
+  test_label_sell_price(),
+  ok.
+
+test_sell_price() ->
+  1400 = sell_price(_ProductType=apple, SupplierID=0, CostPrice=1000),
+  1350 = sell_price(banana, SupplierID, CostPrice),
+  1550 = sell_price(berry,  SupplierID, CostPrice),
+  1500 = sell_price(other,  SupplierID, CostPrice),
+  0    = sell_price(other,  SupplierID, 0),
+  ok.
+
+test_sell_price_premium_supplier() ->
+  [SupplierID|_] = ?PREMIUM_SUPPLIER_IDS,
+  1600 = sell_price(_ProductType=apple, SupplierID, _CostPrice=1010),
+  1500 = sell_price(_ProductType=apple, SupplierID, 1000),
+  ok.
+
+test_sell_price_unfresh_supplier() ->
+  [SupplierID|_] = ?UNFRESH_SUPPLIER_IDS,
+  1200 = sell_price(_ProductType=apple, SupplierID, _CostPrice=1000),
+  70   = sell_price(banana, SupplierID, 200),
+  0    = sell_price(berry,  SupplierID, 0),
+  ok.
 
 test_label_sell_price() ->
   "R   17.23" = label_sell_price(_Cents=1723),
-  "R   17.24" = label_sell_price(1723.94), %% Let's round fractions of cents
   "R  123.04" = label_sell_price(12304),
   "R99999.99" = label_sell_price(9999999),
   "R    1.23" = label_sell_price(123),
   "R    1.20" = label_sell_price(120),
   "R    0.23" = label_sell_price(23),
+  "R    0.01" = label_sell_price(1),
   "R    0.00" = label_sell_price(0),
   ok.
