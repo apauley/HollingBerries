@@ -160,9 +160,12 @@ How do I contribute my solution?
 Why this example?
 =================
 
-When talking to OO programmers that are interested in functional
-programming, one of the common concerns is how do you design/model a
-problem when you don't have your trusted classes and objects?
+When talking to Object Oriented programmers that are interested in
+Functional Programming, one of the common concerns is:
+
+"How do I design/model a problem when I don't have my trusted classes
+and objects available?"
+
 If you're used to the "everything must be an object" philosophy, you
 might feel that your hands are cut off.
 
