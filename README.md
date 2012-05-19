@@ -87,7 +87,29 @@ first 31 characters of it anyway.
 * The markup for berries is 55%.
 * The markup for anything else 50%.
 
-### Premium Produce (tm)
+## Sell-by Dates
+* Apples have to be sold 2 weeks after the date of delivery.
+* Bananas have to be sold 5 days after the date of delivery.
+* All other types of fruit has to be sold 1 week after the date of
+delivery.
+
+## Product Codes
+* Fruit has product codes ranging from 1000 to 1999.
+* Apples specifically have product codes ranging from 1100 to 1199.
+* Bananas have product codes ranging from 1200 to 1299.
+* Berries have product codes ranging from 1300 to 1399.
+
+## Supplier Troubles
+One the suppliers, Susan Windler (Supplier ID 32), has been known to deliver
+fruit that is not quite as fresh as that of the other suppliers.
+Mr. Hollingberry has decided to handle this quietly, by:
+*   ensuring that the sell-by date for anything delivered by Susan is always 3
+    days earlier than normal.
+*   making the price R2 less than usual.
+Come to think of it, Togetherness Tshabalala (Supplier ID 101), also
+needs to be on this list.
+
+## Premium Produce (tm)
 Some suppliers are dedicated Premium Produce (tm) suppliers.
 The customer has to believe that they are buying something better than
 usual.
@@ -103,28 +125,6 @@ The Premium Produce suppliers currently are:
 *   Promise Mashangu (Supplier ID 219)
 *   Karel Visser (Supplier ID 204)
 
-## Sell-by Dates
-* Apples have to be sold 2 weeks after the date of delivery.
-* Bananas have to be sold 5 days after the date of delivery.
-* All other types of fruit has to be sold 1 week after the date of
-delivery.
-
-### Supplier Troubles
-One the suppliers, Susan Windler (Supplier ID 32), has been known to deliver
-fruit that is not quite as fresh as that of the other suppliers.
-Mr. Hollingberry has decided to handle this quietly, by:
-*   ensuring that the sell-by date for anything delivered by Susan is always 3
-    days earlier than normal.
-*   making the price R2 less than usual.
-Come to think of it, Togetherness Tshabalala (Supplier ID 101), also
-needs to be on this list.
-
-
-### Product Codes
-* Fruit has product codes ranging from 1000 to 1999.
-* Apples specifically have product codes ranging from 1100 to 1199.
-* Bananas have product codes ranging from 1200 to 1299.
-* Berries have product codes ranging from 1300 to 1399.
 
 How do I contribute my solution?
 ================================
