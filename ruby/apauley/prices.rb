@@ -3,17 +3,20 @@
 require 'csv'
 require 'date'
 
+PremiumSupplierIDs = [204,219]
+UnfreshSupplierIDs = [32]
+
 class Product
-  def self.create(supplier_id, product_code, description, delivery_date, cost_price, unit_count)
+  def self.create(supplier, product_code, description, delivery_date, cost_price, unit_count)
     if product_code >= 1000 and product_code <= 1999
-      Fruit.create(supplier_id, product_code, description, delivery_date, cost_price, unit_count)
+      Fruit.create(supplier, product_code, description, delivery_date, cost_price, unit_count)
     else
       raise "Bad product code: #{product_code} #{description}"
     end
   end
   
-  def initialize(supplier_id, product_code, description, delivery_date, cost_price, unit_count)
-    @supplier_id   = supplier_id
+  def initialize(supplier, product_code, description, delivery_date, cost_price, unit_count)
+    @supplier      = supplier
     @product_code  = product_code
     @description   = description
     @delivery_date = delivery_date
@@ -26,12 +29,7 @@ class Product
   end
 
   def sell_by_date
-    if @supplier_id == 32
-      days_to_add = shelf_days - 3
-    else
-      days_to_add = shelf_days
-    end
-    @delivery_date + days_to_add
+    @delivery_date + shelf_days + @supplier.shelf_days_modifier
   end
 
   def markup_percentage
@@ -42,8 +40,12 @@ class Product
     @cost_price*(markup_percentage/100.0)
   end
 
+  def sell_price
+    @cost_price + markup + @supplier.sell_price_modifier
+  end
+
   def sell_price_in_rands
-    (@cost_price + markup)/100.0
+    sell_price/100.0
   end
 
   def label_sell_price
@@ -64,13 +66,13 @@ class Product
 end
 
 class Fruit < Product
-  def self.create(supplier_id, product_code, description, delivery_date, cost_price, unit_count)
+  def self.create(supplier, product_code, description, delivery_date, cost_price, unit_count)
     if product_code >= 1100 and product_code <= 1199
-      Apple.new(supplier_id, product_code, description, delivery_date, cost_price, unit_count)
+      Apple.new(supplier, product_code, description, delivery_date, cost_price, unit_count)
     elsif product_code >= 1200 and product_code <= 1299
-      Banana.new(supplier_id, product_code, description, delivery_date, cost_price, unit_count)
+      Banana.new(supplier, product_code, description, delivery_date, cost_price, unit_count)
     elsif product_code >= 1300 and product_code <= 1399
-      Berry.new(supplier_id, product_code, description, delivery_date, cost_price, unit_count)
+      Berry.new(supplier, product_code, description, delivery_date, cost_price, unit_count)
     else
       raise "Bad Fruit product code: #{product_code} #{description}" 
     end
@@ -101,6 +103,46 @@ class Berry < Fruit
   end
 end
 
+class Supplier
+  def self.create(supplier_id)
+    if PremiumSupplierIDs.include?(supplier_id)
+      PremiumSupplier.new(supplier_id)
+    elsif UnfreshSupplierIDs.include?(supplier_id)
+      UnfreshSupplier.new(supplier_id)
+    else
+      self.new(supplier_id)
+    end
+  end
+  
+  def initialize(supplier_id)
+    @supplier_id = supplier_id
+  end
+
+  def id
+    @supplier_id
+  end
+
+  def shelf_days_modifier
+    0
+  end
+
+  def sell_price_modifier
+    0
+  end
+end
+
+class PremiumSupplier < Supplier
+end
+
+class UnfreshSupplier < Supplier
+  def shelf_days_modifier
+    -3
+  end
+
+  def sell_price_modifier
+    -200
+  end
+end
 
 def to_price_file(line, file)
   CSV.parse(line) do |row|
@@ -110,7 +152,9 @@ def to_price_file(line, file)
     delivery_date = Date.parse(row[3])
     cost_price    = Integer(row[4])
     unit_count    = Integer(row[5])
-    product = Product.create(supplier_id, product_code, description, delivery_date, cost_price, unit_count)
+    
+    supplier = Supplier.create(supplier_id)
+    product  = Product.create(supplier, product_code, description, delivery_date, cost_price, unit_count)
     product.write_pricefile(file)
   end
 end
