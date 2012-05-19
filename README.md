@@ -81,23 +81,44 @@ You have to calculate the selling price and the sell-by date. Luckily
 we can use the description just as it is in the csv file. Well, the
 first 31 characters of it anyway.
 
-### Markup Rules
+## Markup Rules
 * The markup for apples  is 40%.
 * The markup for bananas is 35%.
 * The markup for berries is 55%.
 * The markup for anything else 50%.
 
-### Sell-by Dates
+### Premium Produce (tm)
+Some suppliers are dedicated Premium Produce (tm) suppliers.
+The customer has to believe that they are buying something better than
+usual.
+We do this by making the packaging look nice, and by increasing the
+price.
+The suppliers already took care of the nice packaging, you now have to
+make it expensive. Anything supplied by a Premium Produce (tm)
+supplier gets an additional 10% markup, and then the price is rounded
+up to the nearest Rand.
+For example, if a product costs R25.11 after the extra 10% markup has
+been applied, you need to round it up to R26.
+The Premium Produce suppliers currently are:
+*   Promise Mashangu (Supplier ID 219)
+*   Karel Visser (Supplier ID 204)
+
+## Sell-by Dates
 * Apples have to be sold 2 weeks after the date of delivery.
 * Bananas have to be sold 5 days after the date of delivery.
 * All other types of fruit has to be sold 1 week after the date of
 delivery.
 
+### Supplier Troubles
 One the suppliers, Susan Windler (Supplier ID 32), has been known to deliver
 fruit that is not quite as fresh as that of the other suppliers.
-Mr. Hollingberry has decided to handle this quietly, by ensuring that
-the sell-by date for anything delivered by Susan is always 3
-days earlier than normal.
+Mr. Hollingberry has decided to handle this quietly, by:
+*   ensuring that the sell-by date for anything delivered by Susan is always 3
+    days earlier than normal.
+*   making the price R2 less than usual.
+Come to think of it, Togetherness Tshabalala (Supplier ID 101), also
+needs to be on this list.
+
 
 ### Product Codes
 * Fruit has product codes ranging from 1000 to 1999.
@@ -123,7 +144,7 @@ How do I contribute my solution?
 *   Make sure that your solution generates exactly the same output
     file when given the sample input file:
 
-    > $ diff -u pricefile.txt ../../pricefile.txt # Expect no output
+    > $ diff -u ../../pricefile.txt pricefile.txt # Expect no output
 
 *   Include a README file with instructions on how to build/run your
     code. A Makefile or something similar will be nice. Also, tell us
