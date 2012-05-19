@@ -4,7 +4,7 @@ require 'csv'
 require 'date'
 
 PremiumSupplierIDs = [204,219]
-UnfreshSupplierIDs = [32]
+UnfreshSupplierIDs = [32,101]
 
 class Product
   def self.create(supplier, product_code, description, delivery_date, cost_price, unit_count)
@@ -32,8 +32,12 @@ class Product
     @delivery_date + shelf_days + @supplier.shelf_days_modifier
   end
 
-  def markup_percentage
+  def product_markup_percentage
     50
+  end
+
+  def markup_percentage
+    product_markup_percentage + @supplier.markup_percentage_modifier
   end
 
   def markup
@@ -41,7 +45,8 @@ class Product
   end
 
   def sell_price
-    @cost_price + markup + @supplier.sell_price_modifier
+    base_sell_price = @cost_price + markup
+    @supplier.modify_sell_price(base_sell_price)
   end
 
   def sell_price_in_rands
@@ -80,7 +85,7 @@ class Fruit < Product
 end
 
 class Apple < Fruit
-  def markup_percentage
+  def product_markup_percentage
     40
   end
   def shelf_days
@@ -89,7 +94,7 @@ class Apple < Fruit
 end
 
 class Banana < Fruit
-  def markup_percentage
+  def product_markup_percentage
     35
   end
   def shelf_days
@@ -98,7 +103,7 @@ class Banana < Fruit
 end
 
 class Berry < Fruit
-  def markup_percentage
+  def product_markup_percentage
     55
   end
 end
@@ -126,12 +131,23 @@ class Supplier
     0
   end
 
-  def sell_price_modifier
+  def modify_sell_price(sell_price)
+    sell_price
+  end
+
+  def markup_percentage_modifier
     0
   end
 end
 
 class PremiumSupplier < Supplier
+  def markup_percentage_modifier
+    10
+  end
+
+  def modify_sell_price(sell_price)
+    (sell_price/100.0).ceil * 100
+  end
 end
 
 class UnfreshSupplier < Supplier
@@ -139,8 +155,8 @@ class UnfreshSupplier < Supplier
     -3
   end
 
-  def sell_price_modifier
-    -200
+  def modify_sell_price(sell_price)
+    [0, sell_price - 200].max
   end
 end
 
