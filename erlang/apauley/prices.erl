@@ -108,14 +108,18 @@ supplier_markup_percentage_modification(SupplierID) ->
     false -> 0
   end.
 
-shelf_days(_SupplierID=32, ProductType) ->
-  shelf_days(ProductType) - 3;
-shelf_days(_SupplierID, ProductType) ->
-  shelf_days(ProductType).
+shelf_days(SupplierID, ProductType) ->
+  shelf_days(ProductType) + shelf_days_modifier(SupplierID).
 
 shelf_days(apple)        -> 14;
 shelf_days(banana)       -> 5;
 shelf_days(_ProductType) -> 7.
+
+shelf_days_modifier(SupplierID) ->
+  case lists:member(SupplierID, ?UNFRESH_SUPPLIER_IDS) of
+    true  -> -3;
+    false -> 0
+  end.
 
 product_type(ProductCode) when ((ProductCode >= 1100) and (ProductCode =< 1199)) ->
   apple;
