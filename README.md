@@ -100,12 +100,13 @@ delivery.
 * Berries have product codes ranging from 1300 to 1399.
 
 ## Supplier Troubles
-One the suppliers, Susan Windler (Supplier ID 32), has been known to deliver
+One of the suppliers, Susan Windler (Supplier ID 32), has been known to deliver
 fruit that is not quite as fresh as that of the other suppliers.
 Mr. Hollingberry has decided to handle this quietly, by:
 *   ensuring that the sell-by date for anything delivered by Susan is always 3
     days earlier than normal.
 *   making the price R2 less than usual.
+
 Come to think of it, Togetherness Tshabalala (Supplier ID 101), also
 needs to be on this list.
 
@@ -113,7 +114,7 @@ needs to be on this list.
 Some suppliers are dedicated Premium Produce (tm) suppliers.
 The customer has to believe that they are buying something better than
 usual.
-We do this by making the packaging look nice, and by increasing the
+Mr Hollingberry does this by making the packaging look nice, and by increasing the
 price.
 The suppliers already took care of the nice packaging, you now have to
 make it expensive. Anything supplied by a Premium Produce (tm)
@@ -155,3 +156,20 @@ How do I contribute my solution?
     anyone for any purpose. If you use someone elses code it will be
     nice to give him/her credit. Email me if you have a suggestion for an informal
     license that fits these code comparisons. MIT? Creative Commons?
+
+Why this example?
+=================
+
+When talking to OO programmers that are interested in functional
+programming, one of the common concerns is how do you design/model a
+problem when you don't have your trusted classes and objects?
+If you're used to the "everything must be an object" philosophy, you
+might feel that your hands are cut off.
+
+I wanted a scenario that a typical OO programmer would solve using an
+object hierarchy with some polymorphism. And then have solutions for
+the same problem in functional programming languages so that it can be
+easily compared.
+
+Of course it will also be very interesting to see paradigms other than
+OO and FP :-)
