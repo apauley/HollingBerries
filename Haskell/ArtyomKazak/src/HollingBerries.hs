@@ -6,15 +6,25 @@ import Data.Time
 import Data.Time.Format
 import System.Locale
 import Data.Maybe
+import Data.List
+import Data.Ix
 
 data Kind = Apple | Banana | Berry | Other
   deriving Eq
+  
+markupTable = [(Apple, 1.4), (Banana, 1.35), (Berry, 1.55), (Other, 1.5)]
+shelfTable  = [(Apple, 14), (Banana, 5), (Berry, 7), (Other, 7)]
+codeTable   = [(Apple, [(1100, 1199)]), (Banana, [(1200, 1299)]),
+               (Berry, [(1300, 1399)]), (Other, [(1000, 1099), (1400, 1999)])]
+
+isTrouble = (`elem` [32, 101])
+isPremium = (`elem` [204, 219])
 
 data Item = Item
           { supplier :: Int
           , code     :: Int
           , descript :: String
-          , date     :: Day
+          , day      :: Day
           , price    :: Double
           , units    :: Int
           }
@@ -23,13 +33,13 @@ instance Show Item where
   show i = concat (replicate (units i) one)
     where one = printf "R%8.2f%10s%31s\n" 
                   (price i)
-                  (formatTime defaultTimeLocale "%Y/%m/%d" (date i)) 
+                  (formatTime defaultTimeLocale "%Y/%m/%d" (day i)) 
                   (take 31 (descript i))
              
 readItem :: Record -> Item
-readItem [supp, code, desc, date, pric, unit] = 
+readItem [supp, code, desc, day, pric, unit] = 
   Item (read supp) (read code) desc t (read pric / 100) (read unit)
-  where t = readTime defaultTimeLocale "%Y/%m/%d" date
+  where t = readTime defaultTimeLocale "%Y/%m/%d" day
 
 main = parseCSVFromFile "produce.csv" 
    >>= (\(Right f) -> writeFile "pricefile.txt" (process f))
@@ -37,27 +47,17 @@ main = parseCSVFromFile "produce.csv"
 process :: CSV -> String
 process = concatMap (show . calc . readItem) . filter ((== 6) . length). tail
 
-kind :: Item -> Kind
-kind i | x < 1100  = Other
-       | x < 1200  = Apple
-       | x < 1300  = Banana
-       | x < 1400  = Berry
-       | otherwise = Other
-  where x = code i
-
 calc :: Item -> Item
-calc i = i {price = price', date = sellBy'}
+calc i = i {price = price', day = day'}
   where
-    k = kind i
-    trouble = supplier i `elem` [32, 101]
-    premium = supplier i `elem` [204, 219]
+    kind = fst $ fromJust $ find (any (`inRange` (code i)) . snd) codeTable
+    trouble = isTrouble $ supplier i
+    premium = isPremium $ supplier i
     
-    markup = fromJust $ lookup k 
-      [(Apple, 1.4), (Banana, 1.35), (Berry, 1.55), (Other, 1.5)]
+    markup = fromJust $ lookup kind markupTable
     price' = max 0 
            $ if premium then fromIntegral $ ceiling ((markup + 0.1) * price i)
                         else (markup * price i - if trouble then 2 else 0)
     
-    diff = fromJust $ lookup k 
-      [(Apple, 14), (Banana, 5), (Berry, 7), (Other, 7)]
-    sellBy' = addDays (diff - if trouble then 3 else 0) (date i)
+    shelf = fromJust $ lookup kind shelfTable
+    day'  = addDays (shelf - if trouble then 3 else 0) (day i)
