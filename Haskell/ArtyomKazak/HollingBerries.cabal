@@ -1,0 +1,18 @@
+Name:           HollingBerries
+Version:        0.1
+License:        BSD3
+
+Author:         Artyom Kazak
+Maintainer:     Artyom Kazak <artyom.kazak@gmail.com>
+
+Category:       Financial
+Synopsis:       Solves HollingBerries problem
+Description:    See here: https://github.com/apauley/HollingBerries
+
+Build-Depends:  base>=3 && <5, csv, time, old-locale
+Build-Type:     Simple
+Tested-with:    GHC==6.12.1
+
+Executable:     HollingBerries
+Main-Is:        HollingBerries.hs
+Hs-Source-Dirs: src
