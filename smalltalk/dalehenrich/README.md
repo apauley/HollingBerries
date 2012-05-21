@@ -6,14 +6,15 @@ A Smalltalk solution based on [Pharo][3].
 
 ### Solution Installation
 
-After [**installing and launching Pharo**](#pharo-installation), execute the
-following in a Smalltalk workspace (edit the path to point to your
-clone):
+After [**installing and launching Pharo**](#pharo-installation), copy and execute the following in
+a Smalltalk workspace (edit the path to point to your clone):
 
 ```Smalltalk
 (FileStream fileNamed: '/opt/git/HollingBerries/smalltalk/dalehenrich/HollingBerries-Core.st') fileIn.
 ```
 ### Solution Execution
+
+To run the program, copy and execute the following in a Smalltalk workspace (edit the paths):
 
 ```Smalltalk
 HBPriceListGenerator 
