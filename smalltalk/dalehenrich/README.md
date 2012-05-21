@@ -25,8 +25,7 @@ HBPriceListGenerator
 ## Pharo Installation
 
 You'll need to install a [Pharo1.3 image][1]. The [Pharo 1.3
-on-click][2] is a good choice. First 
-`unzip Pharo-1.3-13328-OneClick.zip`:
+on-click][2] is a good choice. Unzip `Pharo-1.3-13328-OneClick.zip`, then:
 
 ### On Linux
 
@@ -48,8 +47,8 @@ Double-click on `Pharo-1.3-13328-OneClick` in the finder.
 
 ## Using Pharo
 
-If you're not familiar with using a Pharo Smalltalk image, view at least the very beginning of [this video][4], 
-for an introduction to using Pharo. The remainder of the video is a beginning Smalltalk tutorial.
+If you're not familiar with using a Pharo Smalltalk image, view the very beginning of [this video][4], 
+for an introduction to using Pharo. The remainder of the video is a Smalltalk tutorial which might be interesting.
 
 [1]: http://www.pharo-project.org/pharo-download/release-1-3
 [2]: http://gforge.inria.fr/frs/download.php/30586/Pharo-1.3-13328-OneClick.zip
