@@ -45,6 +45,12 @@ cd Pharo-1.3-13328-OneClick.app
 
 Double-click on `Pharo-1.3-13328-OneClick` in the finder.
 
+## Using Pharo
+
+If you're not familiar with using a Pharo Smalltalk image, view at least the very beginning of [this video][4], 
+for an introduction to using Pharo. The remainder of the video is a beginning Smalltalk tutorial.
+
 [1]: http://www.pharo-project.org/pharo-download/release-1-3
 [2]: http://gforge.inria.fr/frs/download.php/30586/Pharo-1.3-13328-OneClick.zip
 [3]: http://www.pharo-project.org/
+[4]: http://www.pharocasts.com/2010/01/learn-smalltalk-with-profstef.html
