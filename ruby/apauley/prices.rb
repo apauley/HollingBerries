@@ -72,11 +72,11 @@ end
 
 class Fruit < Product
   def self.create(supplier, product_code, description, delivery_date, cost_price, unit_count)
-    if product_code >= 1100 and product_code <= 1199
+    if (1100..1199).include?(product_code)
       Apple.new(supplier, product_code, description, delivery_date, cost_price, unit_count)
-    elsif product_code >= 1200 and product_code <= 1299
+    elsif (1200..1299).include?(product_code)
       Banana.new(supplier, product_code, description, delivery_date, cost_price, unit_count)
-    elsif product_code >= 1300 and product_code <= 1399
+    elsif (1300..1399).include?(product_code)
       Berry.new(supplier, product_code, description, delivery_date, cost_price, unit_count)
     else
       raise "Bad Fruit product code: #{product_code} #{description}" 
