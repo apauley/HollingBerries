@@ -1,0 +1,17 @@
+Name:                holling
+Version:             0.1
+Synopsis:            An example of a small business app in Haskell
+License:             BSD3
+License-file:        LICENSE
+Author:              Iavor S. Diatchki
+Maintainer:          iavor.diatchki@gmail.com
+Build-type:          Simple
+Extra-source-files:  README
+Cabal-version:       >=1.2
+
+
+Executable holling
+  Main-is: holling.hs
+  Build-depends: base, containers, parsec, time
+
+
