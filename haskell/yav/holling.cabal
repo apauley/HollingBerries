@@ -6,7 +6,7 @@ License-file:        LICENSE
 Author:              Iavor S. Diatchki
 Maintainer:          iavor.diatchki@gmail.com
 Build-type:          Simple
-Extra-source-files:  README
+Extra-source-files:  README.markdown
 Cabal-version:       >=1.2
 
 
