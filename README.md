@@ -151,6 +151,10 @@ How do I contribute my solution?
     code. A Makefile or something similar will be nice. Also, tell us
     a bit about your solution if you feel like it.
 
+*   Ensure that your repository is up to date:
+
+    > $ git pull --rebase
+
 *   Send me a pull request so that your solution is included with the
     others. By doing this you agree that your code may be used by
     anyone for any purpose. If you use someone elses code it will be
