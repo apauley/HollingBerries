@@ -39,7 +39,7 @@ We use the following fields:
 
 *   Delivery date.
 
-    YYYY-MM-DD. We use this to calculate the sell-by date.
+    YYYY/MM/DD. We use this to calculate the sell-by date.
 
 *   Cost price.
 
@@ -59,8 +59,9 @@ The price file is in fixed-width format, because the label printer has
 limited space (50 characters) for each price tag. Each line in the price file will
 cause one price tag to be printed.
 
-The selling price takes up 9 characters. One currency symbol (R) and 8
-digits where Rands and cents are seperated by a period: R99999.99
+The selling price takes up 9 characters. One currency symbol (R), 5
+digits before the decimal (a dot) and 2 digits afer the decimal.
+Like this: R99999.99
 
 Mr Hollingberry says we shouldn't worry about larger amounts. If he
 ever sells something for a 100 grand he will have to retire again, and
