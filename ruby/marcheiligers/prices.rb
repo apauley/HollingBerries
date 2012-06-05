@@ -1,3 +1,6 @@
+require 'csv'
+require 'date'
+
 class Product
   attr_reader :supplier_id, 
               :product_code,
@@ -10,11 +13,12 @@ class Product
                 :shelf_life
 
   def initialize(supplier_id, product_code, description, delivery_date, cost_price, unit_count)
-    @supplier_id = supplier_id
-    @product_code = product_code
+    @supplier_id = supplier_id.to_i
+    @product_code = product_code.to_i
     @description = description
-    @cost_price = cost_price
-    @unit_count = unit_count
+    @delivery_date = Date.parse delivery_date
+    @cost_price = cost_price.to_i
+    @unit_count = unit_count.to_i
 
     @markup = 0.5
     @shelf_life = 7
@@ -25,7 +29,7 @@ class Product
   end
 
   def sell_by
-    delivery_date + shelf_life * 24 * 60 * 60
+    delivery_date + shelf_life
   end
 
   def short_description
@@ -34,8 +38,6 @@ class Product
 end
 
 module Reader
-  require 'csv'
-
   def read(filename)
     products = []
     # We're ignoring the CSV file header
@@ -50,18 +52,23 @@ module Reader
 end
 
 module RuleProcessor
-  attr_reader :rules
-  def self.included
-    @rules = []
+  def self.included(host)
+    host.extend ClassMethods
   end
 
-  def add_rule(rule)
-    @rules << rule
+  module ClassMethods
+    def has_rules(*rules_arr)
+      rules.concat rules_arr
+    end
+
+    def rules
+      @rules ||= []
+    end
   end
 
-  def process(products)
+  def apply_rules!(products)
     products.each do |product|
-      @rules.each do |rule|
+      self.class.rules.each do |rule|
         rule.apply! product if rule.matches? product
       end
     end
@@ -70,31 +77,28 @@ end
 
 class Rule
   class << self
-    attr_reader :product_codes_from,
-                :product_codes_to,
-                :markup,
-                :shelf_life
-
     def product_codes(from, to)
       @product_codes_from = from
       @product_codes_to = to
     end
 
-    def shelf_life(days)
-      @shelf_life = days
+    def shelf_life(days = nil)
+      @shelf_life = days if days
+      @shelf_life
     end
 
-    def markup(perc)
-      @markup = perc
+    def markup(perc = nil)
+      @markup = perc if perc
+      @markup
     end
 
     def matches?(product)
-      product_code >= product_codes_from && product_code <= product_codes_to
+      product.product_code >= @product_codes_from && product.product_code <= @product_codes_to
     end
 
     def apply!(product)
-      product.markup = markup if markup
-      product.shelf_life = shelf_life if shelf_life
+      product.markup = @markup if @markup
+      product.shelf_life = @shelf_life if @shelf_life
     end
   end
 end
@@ -130,28 +134,69 @@ class TroubleSupplierRule < Rule
   end
 
   def self.apply!(product)
-    product.include self
+    product.extend Overrides
   end
 
-  def selling_price
-    cost_price * (1 + markup) - 2
-  end
+  module Overrides
+    def selling_price
+      cost_price * (1 + markup) - 2
+    end
 
-  def sell_by
-    delivery_date + (shelf_life - 3) * 24 * 60 * 60
+    def sell_by
+      delivery_date + (shelf_life - 3) * 24 * 60 * 60
+    end
   end
 end
 
-class PremiumProduceRule
-  def
+class PremiumProduceRule < Rule
+  PREMIUM_SUPPLIER_IDS = [ 219, 204 ]
+
+  def self.matches?(product)
+    PREMIUM_SUPPLIER_IDS.include? product.supplier_id 
+  end
+
+  def self.apply!(product)
+    product.extend Overrides
+  end
+
+  module Overrides
+    def selling_price
+      (cost_price * (1 + markup + 0.1)).ceil
+    end
+  end
+end
+
+module Writer
+  def write(filename, products)
+    File.open(filename, 'w') do |file|
+      products.each do |product|
+        file.puts "R#{product.selling_price}#{product.sell_by}#{product.short_description}"
+      end
+    end
+  end
 end
 
 class LabelPrinter
   include Reader
   include RuleProcessor
+  include Writer
+
+  has_rules FruitRule,
+            AppleRule,
+            BananaRule,
+            BerryRule,
+            TroubleSupplierRule,
+            PremiumProduceRule
 
   def process(input_filename, output_filename)
+    products = read input_filename
+    apply_rules! products
+    write output_filename, products
   end
 end
 
-puts Reader.read('../../produce.csv').inspect
+LabelPrinter.new.process '../../produce.csv', 'pricefile.txt'
+
+
+
+
