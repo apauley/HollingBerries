@@ -126,42 +126,45 @@ class BerryRule < Rule
   markup 0.55
 end
 
-class TroubleSupplierRule < Rule
-  TROUBLE_SUPPLIER_IDS = [ 32, 101 ]
-
-  def self.matches?(product)
-    TROUBLE_SUPPLIER_IDS.include? product.supplier_id 
+class SupplierRule
+  def self.for_suppliers(*ids)
+    suppliers.concat ids
+    self
   end
 
+  def self.suppliers
+    @suppliers ||= []
+  end
+
+  def self.matches?(product)
+    suppliers.include? product.supplier_id 
+  end
+end
+
+class TroubleSupplierRule < SupplierRule
   def self.apply!(product)
     product.extend Overrides
   end
 
   module Overrides
     def selling_price
-      cost_price * (1 + markup) - 2
+      [cost_price * (1 + markup) - 200, 0].max
     end
 
     def sell_by
-      delivery_date + (shelf_life - 3) * 24 * 60 * 60
+      delivery_date + shelf_life - 3
     end
   end
 end
 
-class PremiumProduceRule < Rule
-  PREMIUM_SUPPLIER_IDS = [ 219, 204 ]
-
-  def self.matches?(product)
-    PREMIUM_SUPPLIER_IDS.include? product.supplier_id 
-  end
-
+class PremiumProduceRule < SupplierRule
   def self.apply!(product)
     product.extend Overrides
   end
 
   module Overrides
     def selling_price
-      (cost_price * (1 + markup + 0.1)).ceil
+      (cost_price * (1 + markup + 0.1) / 100).ceil * 100
     end
   end
 end
@@ -170,7 +173,7 @@ module Writer
   def write(filename, products)
     File.open(filename, 'w') do |file|
       products.each do |product|
-        file.puts "R#{product.selling_price}#{product.sell_by}#{product.short_description}"
+        product.unit_count.times { file.puts "R#{'% 8.2f' % (product.selling_price / 100.0)}#{product.sell_by.strftime('%Y/%m/%d')}#{product.short_description}" }
       end
     end
   end
@@ -185,8 +188,8 @@ class LabelPrinter
             AppleRule,
             BananaRule,
             BerryRule,
-            TroubleSupplierRule,
-            PremiumProduceRule
+            TroubleSupplierRule.for_suppliers(32, 101),
+            PremiumProduceRule.for_suppliers(219, 204)
 
   def process(input_filename, output_filename)
     products = read input_filename
