@@ -19,9 +19,6 @@ class Product
     @delivery_date = Date.parse delivery_date
     @cost_price = cost_price.to_i
     @unit_count = unit_count.to_i
-
-    @markup = 0.5
-    @shelf_life = 7
   end
 
   def selling_price
@@ -104,9 +101,9 @@ class Rule
 end
 
 class FruitRule < Rule
-  product_codes 1100, 1199
-  markup 0.4
-  shelf_life 14
+  product_codes 1000, 1999
+  markup 0.5
+  shelf_life 7
 end
 
 class AppleRule < Rule
@@ -126,7 +123,7 @@ class BerryRule < Rule
   markup 0.55
 end
 
-class SupplierRule
+class SupplierRule < Rule
   def self.for_suppliers(*ids)
     suppliers.concat ids
     self
