@@ -1,0 +1,345 @@
+report  zholling.
+
+* Data type Declarations
+types: t_perc(3) type p decimals 2,
+       t_curr(7) type p decimals 2,
+       t_string_t   type table of string.
+
+* it is very important that the 1st 6 fields match the input structure.
+types: begin of t_calc,
+        supp_id type num4,
+        prod_code type num4,
+        prod_descr type text100,
+        deliv_date type d,
+        unit_price type num10,
+        no_units type num10,
+        exp_date   type d,
+        sale_price type t_curr,
+      end of t_calc,
+      t_calc_t type table of t_calc.
+
+types: begin of t_prodinfo,
+        code_from     type num4,
+        code_to       type num4,
+        sell_by_days(4)  type p,
+        markup        type t_perc,
+       end of t_prodinfo,
+       t_prodinfo_t   type table of t_prodinfo.
+
+types: begin of t_supplierinfo,
+        supp_id       type num4,
+        supp_type     type num1,   " 1 = Premium, 2 = Poor
+        sell_by_days(4)  type p,
+        markup_perc   type t_perc,
+        markup_curr   type t_curr,
+        roundup       type flag,
+      end of t_supplierinfo,
+      t_supplierinfo_t   type table of t_supplierinfo.
+
+
+*&---------------------------------------------------------------------*
+*&      Selection screen for specifying the input and output file to
+*&      be processed on the server
+*&---------------------------------------------------------------------*
+parameters: p_input type string lower case obligatory default 'produce.csv',
+            p_output type string lower case obligatory default 'pricefile.txt'.
+
+at selection-screen on value-request for p_input.
+  perform select_file using space changing p_input.
+
+at selection-screen on value-request for p_output.
+  perform select_file using 'X' changing p_output.
+
+*&---------------------------------------------------------------------*
+*&      Form  select_file
+*&      Present the user with a file selection dialog box
+*&---------------------------------------------------------------------*
+form select_file using overwrite type flag
+                changing p_filename type string.
+
+  data: lv_filename type string,
+        lv_path     type string,
+        lv_fullpath type string.
+
+  cl_gui_frontend_services=>file_save_dialog( exporting  window_title = 'Select File'
+                                                         prompt_on_overwrite  = overwrite
+                                              changing   filename             = lv_filename
+                                                         path                 = lv_path
+                                                         fullpath             = p_filename
+                                              exceptions cntl_error           = 1
+                                                         error_no_gui         = 2
+                                                         not_supported_by_gui = 3
+                                                         others               = 4 ).
+  if sy-subrc <> 0.
+    message id sy-msgid type sy-msgty number sy-msgno with sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  endif.
+
+endform.                    "select_file
+
+*&---------------------------------------------------------------------*
+*&      Form  parse_csv
+*&      Never realised parsing CSV in SAP is such a mission,
+*&      could be I am missing something but anyone with something
+*&      better than 'RSDS_CONVERT_CSV' please let me know
+*&      Also, this routine should really take the data directly into
+*&      the t_calc struct as that will simplify the whole thing greatly.
+*&---------------------------------------------------------------------*
+form parse_csv   using     p_inputfile type t_string_t
+                 changing  p_calc      type t_calc_t.
+
+  data:         lt_fields   type t_string_t,
+                ls_calc     type t_calc,
+                lv_text     type char8.
+
+  data:         lr_type     type ref to cl_abap_structdescr.
+  field-symbols: <ls_line>  type string,
+                 <ls_field> type string.
+*                 <ls_comp>  type any.
+  field-symbols: <ls_comp>  type abap_compdescr,
+                 <ls_value> type any.
+
+* get an abap type description of the calc structure. used for mapping later.
+  lr_type ?= cl_abap_typedescr=>describe_by_data( ls_calc ).
+
+  "we will process the input file row by row.
+  loop at p_inputfile assigning <ls_line>.
+    check sy-tabix > 1. "ignore header line
+    "below is only FM I could find for doing CSV conversion
+    "it returns the converted fields in internal table(array) of strings
+    call function 'RSDS_CONVERT_CSV'
+      exporting
+        i_data_sep    = ','
+        i_esc_char    = '"'
+        i_record      = <ls_line>
+        i_field_count = 6
+      importing
+        e_t_data      = lt_fields
+      exceptions
+        others        = 4.
+    if sy-subrc <> 0.
+      message id sy-msgid type sy-msgty number sy-msgno with sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+    else.
+      clear ls_calc.
+*      loop at the type description of ls_calc
+      loop at lr_type->components assigning <ls_comp>.
+        read table lt_fields assigning <ls_field> index sy-tabix.   "This will only work for the 1st 6 fields
+        if sy-subrc = 0.
+          assign component <ls_comp>-name of structure ls_calc to <ls_value>.
+          case <ls_comp>-name.
+            when 'DELIV_DATE'.
+              "Special Case. Need to convert the text date to real date.
+              concatenate <ls_field>(4) <ls_field>+5(2)
+                          <ls_field>+8(2) into lv_text.
+              <ls_value>  =   lv_text.
+            when others.
+              <ls_value> = <ls_field>. "the other fields can map directly.
+          endcase.
+        endif.
+      endloop.
+*     add the mapped row to the calc structure.
+      append ls_calc to p_calc.
+    endif.
+  endloop.
+
+endform.                      "parse_csv
+
+*&---------------------------------------------------------------------*
+*&      Form  get_supplier_info
+*&      get all the hardcoded info about the suppliers
+*&      This is nasty but would almost always be read from the DB.
+*&---------------------------------------------------------------------*
+form get_supplier_info changing p_suppinfo type t_supplierinfo_t.
+  data: ls_suppinfo type t_supplierinfo.
+
+  "Susan Windler (Supplier ID 32)
+  ls_suppinfo-supp_id       = 32.
+  ls_suppinfo-supp_type     = 2. "poor
+  ls_suppinfo-sell_by_days  = '-3'.
+  ls_suppinfo-markup_perc   = 0.
+  ls_suppinfo-markup_curr   = '-2'.
+  ls_suppinfo-roundup       = ''.
+  append ls_suppinfo to p_suppinfo.
+  "Togetherness Tshabalala (Supplier ID 101)
+  ls_suppinfo-supp_id       = 101.
+  ls_suppinfo-supp_type     = 2. "poor
+  ls_suppinfo-sell_by_days  = '-3'.
+  ls_suppinfo-markup_perc   = 0.
+  ls_suppinfo-markup_curr   = '-2'.
+  ls_suppinfo-roundup       = ''.
+  append ls_suppinfo to p_suppinfo.
+  "Promise Mashangu (Supplier ID 219)
+  ls_suppinfo-supp_id       = 219.
+  ls_suppinfo-supp_type     = 1. "premium
+  ls_suppinfo-sell_by_days  = 0.
+  ls_suppinfo-markup_perc   = '0.10'.
+  ls_suppinfo-markup_curr   = 0.
+  ls_suppinfo-roundup       = 'X'.
+  append ls_suppinfo to p_suppinfo.
+  "Karel Visser (Supplier ID 204)
+  ls_suppinfo-supp_id       = 204.
+  ls_suppinfo-supp_type     = 1. "premium
+  ls_suppinfo-sell_by_days  = 0.
+  ls_suppinfo-markup_perc   = '0.10'.
+  ls_suppinfo-markup_curr   = 0.
+  ls_suppinfo-roundup       = 'X'.
+  append ls_suppinfo to p_suppinfo.
+endform.                     "get_supplier_info
+
+*&---------------------------------------------------------------------*
+*&      Form  get_produce_info
+*&      get all the hardcoded info about the products
+*&      This is nasty but would almost always be read from the DB.
+*&---------------------------------------------------------------------*
+form get_product_info changing p_prodinfo type t_prodinfo_t.
+
+  data: ls_prodinfo type t_prodinfo.
+  "Other Fruit 1
+  ls_prodinfo-code_from     = 1000.
+  ls_prodinfo-code_to       = 1099.
+  ls_prodinfo-sell_by_days  = 7.
+  ls_prodinfo-markup        = '0.50'.
+  append ls_prodinfo to p_prodinfo.
+  "Apples
+  ls_prodinfo-code_from     = 1100.
+  ls_prodinfo-code_to       = 1199.
+  ls_prodinfo-sell_by_days  = 14.
+  ls_prodinfo-markup        = '0.40'.
+  append ls_prodinfo to p_prodinfo.
+  "Bananas
+  ls_prodinfo-code_from     = 1200.
+  ls_prodinfo-code_to       = 1299.
+  ls_prodinfo-sell_by_days  = 5.
+  ls_prodinfo-markup        = '0.35'.
+  append ls_prodinfo to p_prodinfo.
+  "Berries
+  ls_prodinfo-code_from     = 1300.
+  ls_prodinfo-code_to       = 1399.
+  ls_prodinfo-sell_by_days  = 7.
+  ls_prodinfo-markup        = '0.55'.
+  append ls_prodinfo to p_prodinfo.
+  "Other Fruit2
+  ls_prodinfo-code_from     = 1400.
+  ls_prodinfo-code_to       = 1999.
+  ls_prodinfo-sell_by_days  = 7.
+  ls_prodinfo-markup        = '0.50'.
+  append ls_prodinfo to p_prodinfo.
+
+endform.                    "get_produce_info
+
+*&---------------------------------------------------------------------*
+*&      Form  perform_calculations
+*&      Here we process the input and calculate the output
+*&---------------------------------------------------------------------*
+form perform_calculations using p_suppinfo type t_supplierinfo_t
+                                p_prodinfo type t_prodinfo_t
+                       changing p_calc     type t_calc_t.
+
+  field-symbols: <ls_prodinfo> type t_prodinfo,
+                 <ls_suppinfo> type t_supplierinfo,
+                 <ls_calc>     type t_calc.
+
+  loop at p_calc assigning <ls_calc>.
+
+**    Calc Sales Price & Expiry Date based on product info
+    loop at p_prodinfo assigning <ls_prodinfo>
+                       where code_from <= <ls_calc>-prod_code
+                         and code_to   >= <ls_calc>-prod_code.
+      <ls_calc>-sale_price = <ls_calc>-unit_price * ( 1 + <ls_prodinfo>-markup ) / 100.
+      <ls_calc>-exp_date   = <ls_calc>-deliv_date + <ls_prodinfo>-sell_by_days.
+    endloop.
+
+**    adjust for different suppliers
+    read table p_suppinfo assigning <ls_suppinfo>
+                          with key supp_id = <ls_calc>-supp_id.
+    if sy-subrc = 0. "record found.
+      "I may be doing unneccessary calcs here, but I believe it gives slightly greater flexibility.
+      <ls_calc>-sale_price = <ls_calc>-sale_price + ( <ls_calc>-unit_price * <ls_suppinfo>-markup_perc / 100 ).
+      <ls_calc>-sale_price = <ls_calc>-sale_price + <ls_suppinfo>-markup_curr.
+      <ls_calc>-exp_date   = <ls_calc>-exp_date + <ls_suppinfo>-sell_by_days.
+      if <ls_suppinfo>-roundup = 'X'.
+        <ls_calc>-sale_price = ceil( <ls_calc>-sale_price ).
+      endif.
+    endif.
+
+    "ensure price not less than 0.
+    if <ls_calc>-sale_price < 0.
+      <ls_calc>-sale_price = 0.
+    endif.
+
+  endloop.
+
+endform.                   "perform_calculations
+*&---------------------------------------------------------------------*
+*&      Form  generate_outfile
+*&      Generate an itab with the output file data in it.
+*&---------------------------------------------------------------------*
+form generate_outfile  using p_calc type t_calc_t
+                       changing p_outfile type t_string_t.
+
+  field-symbols: <ls_calc> type t_calc.
+  data: lv_out type string,
+        lv_date type char10,
+        lv_price type char9.
+
+  loop at p_calc assigning <ls_calc>.
+    do <ls_calc>-no_units times.
+      lv_price = <ls_calc>-sale_price.
+      lv_date  = <ls_calc>-exp_date.
+      "I could have used a write here to date formatting, etc. However that is dependent on user settings.
+      concatenate 'R' lv_price lv_date(4) '/' lv_date+4(2) '/' lv_date+6(2) <ls_calc>-prod_descr(31)
+             into lv_out.
+      append lv_out to p_outfile.
+    enddo.
+  endloop.
+
+endform.                    "generate_outfile
+
+*&---------------------------------------------------------------------*
+*&      Form  main
+*&      Main routine just used for preventing too many global vars.
+*&---------------------------------------------------------------------*
+form main.
+
+  data: lt_infile   type t_string_t,
+        lt_outfile  type t_string_t,
+        lt_suppinfo type t_supplierinfo_t,
+        lt_prodinfo type t_prodinfo_t,
+        lt_calc     type t_calc_t.
+
+  " I am using front-end upload as most people will struggle to get files onto the server.
+  " This influences the design of this routeine as most of the work I then do is in memory.
+  " If this was a truly huge file, you would put on the server and process in blocks.
+  cl_gui_frontend_services=>gui_upload(  exporting  filename  = p_input
+                                         changing   data_tab  = lt_infile
+                                         exceptions others    = 99 ). "Simplifying exceptions for brevity here.
+  if sy-subrc <> 0.
+    message id sy-msgid type sy-msgty number sy-msgno with sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  endif.
+
+  perform parse_csv   using lt_infile
+                      changing  lt_calc.
+
+  perform get_product_info changing lt_prodinfo.
+  perform get_supplier_info changing lt_suppinfo.
+
+  perform perform_calculations using lt_suppinfo
+                                     lt_prodinfo
+                            changing lt_calc.
+
+  perform generate_outfile using lt_calc
+                           changing lt_outfile.
+
+* download the output file to the local pc.
+  cl_gui_frontend_services=>gui_download(  exporting filename  = p_output
+"                                                     write_lf  = ' '
+                                                     write_lf_after_last_line  = ' '
+                                           changing  data_tab  = lt_outfile
+                                           exceptions others   = 99 ).
+  if sy-subrc <> 0.
+    message id sy-msgid type sy-msgty number sy-msgno with sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+  endif.
+
+endform.                 "main
+
+start-of-selection.
+  perform main.
