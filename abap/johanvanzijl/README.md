@@ -16,9 +16,9 @@ Well, first you will need access to an ABAP Server or install one. If you don't 
 This program is a simple ABAP report and should run on most systems(I used bare NW 7.02). 
 
 Steps to Install:
-1. Create a new program in transaction SE38 and call it ZHOLLING.
-2. Paste the code into the Editor.
-3. Save, Activate and Execute.
+*   Create a new program in transaction SE38 and call it ZHOLLING.
+*   Paste the code into the Editor.
+*   Save, Activate and Execute.
 
 
 
