@@ -33,7 +33,9 @@
 All the commands listed below should be executed in your command line tool. If you want to run straight away, use the **One Stop Command To Run** below
 
 ###Just Cleaning   
+
 If you have already built and need to rebuild the application, use the command  
+
 		ant clean
 
 ###Just Compiling   
