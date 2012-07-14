@@ -5,9 +5,8 @@
 
 *   There are two implementations of this parallelized version. The two can be alternated by commenting out one of the lines in the code - in the regions of lines 73 - 75 in the method readAndPopulate. The two lines are as follows:  
 
-	`ExecutorService executor = Executors.newCachedThreadPool(Executors.defaultThreadFactory());`
-  
-        `//ExecutorService executor = Executors.newFixedThreadPool(1,Executors.defaultThreadFactory());`
+		ExecutorService executor = Executors.newCachedThreadPool(Executors.defaultThreadFactory())
+		//ExecutorService executor = Executors.newFixedThreadPool(1,Executors.defaultThreadFactory());
   
 	The first allows a faster run - depending on machine specs - but distorts the output file on a product type to product type basis but products represented by a single line in the input file will be arranged together.  
 	The second one is a slower than the first but provides output that is arranged in accordance with the sequence in the input file.
@@ -38,24 +37,27 @@ If you have already built and need to rebuild the application, use the command
 		ant clean
 
 ###Just Compiling   
-To just compile, use the command:      
-		ant compile     
-To clean and compile please use:       
-		ant clean compile	    	
 
-###Running Application      
-To run the application, use the command    
-		ant run 
-OR    
-		ant clean run
+To just compile, use the command:     
+				ant compile     
+To clean and compile please use:           
+				ant clean compile	    	
 
-###One Stop Command To Run   
-To simply do all the above with one command, use:    
-		ant 
-OR    
-		ant run 
-OR    
-		ant clean run  
+###Running Application
+      
+To run the application, use the command          
+				ant run    
+OR        
+				ant clean run   
+
+###One Stop Command To Run    
+
+To simply do all the above with one command, use:       
+				ant     
+OR       
+				ant run     
+OR       
+				ant clean run  
 
 
 ## License
