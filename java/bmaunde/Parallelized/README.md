@@ -2,11 +2,15 @@
 ## The Parallelized Version - By Brian Maunde
 
 **Notes:**
+
 *   There are two implementations of this parallelized version. The two can be alternated by commenting out one of the lines in the code - in the regions of lines 73 - 75 in the method readAndPopulate. The two lines are as follows:  
-	`<code>`ExecutorService executor = Executors.newCachedThreadPool(Executors.defaultThreadFactory());   
-        //ExecutorService executor = Executors.newFixedThreadPool(1,Executors.defaultThreadFactory());  
-    The first allows a faster run - depending on machine specs - but distorts the output file on a product type to product type basis but products represented by a single line in the input file will be arranged together.  
+
+	`ExecutorService executor = Executors.newCachedThreadPool(Executors.defaultThreadFactory());   
+        //ExecutorService executor = Executors.newFixedThreadPool(1,Executors.defaultThreadFactory());`
+  
+The first allows a faster run - depending on machine specs - but distorts the output file on a product type to product type basis but products represented by a single line in the input file will be arranged together.  
 The second one is a slower than the first but provides output that is arranged in accordance with the sequence in the input file.
+
 	
 *I broke the rules a bit and in this way - my ouput is arranged as follows using 29 characters from the description, combining the curreny indicator(R) and the selling price whilst putting spaces between the three components selling price, sellby-date and description. Also, the output is in csv format:
 
@@ -18,7 +22,7 @@ The second one is a slower than the first but provides output that is arranged i
 **Java 7.**   
 >There were a couple of cool features introduced in Java 7 that were used in this.  
 
-**ANT   
+**ANT**  
 >To build using the provided file, you will need ant.    Preferably version 1.6 or later.
 
 **Location of Produce.csv file**   
@@ -29,16 +33,25 @@ The second one is a slower than the first but provides output that is arranged i
 All the commands listed below should be executed in your command line tool
 
 ###Just Cleaning   
-  	If you have already built and need to rebuild the application, use the command  **ant clean**
+  	If you have already built and need to rebuild the application, use the command  
+**ant clean**
 
 ###Just Compiling   
-  	To just compile, use the command:      **ant compile**     To clean and compile please use:       **ant clean compile**	    	
+  	To just compile, use the command:      
+*ant compile*     
+	To clean and compile please use:       
+*ant clean compile*	    	
 
 ###Running Application      
-  	To run the application, use the command    **ant run** OR    **ant clean run**
+  	To run the application, use the command    
+*ant run* OR    
+*ant clean run*
 
 ###One Time Running   
-	To simply do all the above with one command, use:    **ant** OR    **ant run** OR    **ant clean run**  
+	To simply do all the above with one command, use:    
+*ant* OR    
+*ant run* OR    
+*ant clean run*  
 
 
 ## License
