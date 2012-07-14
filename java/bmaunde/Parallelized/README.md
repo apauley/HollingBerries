@@ -3,7 +3,7 @@
 
 **Notes:**
 
-*   There are two implementations of this parallelized version. The two can be alternated by commenting out one of the lines in the code - in the regions of lines 73 - 75 in the method readAndPopulate. The two lines are as follows:  
+*   There are two implementations of this parallelized version. The two can be alternated by commenting out one of the lines in the code - in the regions of lines 73 - 75 in the method **readAndPopulate**. The two lines are as follows:  
 
 		ExecutorService executor = Executors.newCachedThreadPool(Executors.defaultThreadFactory())
 		//ExecutorService executor = Executors.newFixedThreadPool(1,Executors.defaultThreadFactory());
@@ -20,10 +20,10 @@
 ##Requirements
 
 **Java 7**   
->There were a couple of cool features introduced in Java 7 that were used in this.  
+>There were a couple of cool features introduced in Java 7 that were used in this program.  
 
 **ANT**  
->To build using the provided file, you will need ant.    Preferably version 1.6 or later.
+>To build using the provided file, you will need ant - preferably version 1.6 or later.
 
 **Location of the Produce.csv file**   
 >You need to put the **produce.csv** file in the directory with this README.md file, the build file and src folder file (the Parallelized folder according to the setup in GIT). The root directory of the application. If you get the *FileNotFoundException*, the most probable reason is that you have put this file in the wrong directory.
