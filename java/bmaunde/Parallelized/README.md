@@ -30,23 +30,20 @@
 
 ## Building the Application    
 
-All the commands listed below should be executed in your command line tool. If you want to run straight away, use the **One Stop Command To Run** below
+All the commands listed below should be executed in your command line tool with your current context being the directory with the **build.xml** file.
 
-###Just Cleaning   
 
-If you have already built and need to rebuild the application, use the command  
+###Clean and Build   
 
-		ant clean
-
-###Just Compiling   
-
-To just compile, use the command:
+To clean and build, use the command:
      
-				ant compile     
+				ant clean-build    
 
-To clean and compile please use:           
+###Build:     
 
-				ant clean compile	    	
+To build without cleaning, use command      
+
+				ant build    	
 
 ###Running Application
       
@@ -54,23 +51,11 @@ To run the application, use the command
      
 				ant run    
 
-OR        
+OR (with cleaning)       
 
-				ant clean run   
+				ant clean run 
 
-###One Stop Command To Run    
 
-To simply do all the above with one command, use:   
-    
-				ant     
-
-OR       
-
-				ant run 
-    
-OR       
-
-				ant clean run  
 
 
 
