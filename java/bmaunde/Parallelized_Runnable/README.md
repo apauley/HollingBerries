@@ -26,7 +26,7 @@
 >To build using the provided file, you will need ant - preferably version 1.6 or later.
 
 **Location of the Produce.csv file**   
->You need to put the **produce.csv** file in the directory with this README.md file, the build file and src folder file (the Parallelized folder according to the setup in GIT). The root directory of the application. If you get the *FileNotFoundException*, the most probable reason is that you have put this file in the wrong directory.
+>You need to put the **produce.csv** file in the directory with this README.md file, the build file and src folder file (the Parallelized_Runnable folder according to the setup in GIT). The root directory of the application. If you get the *FileNotFoundException*, the most probable reason is that you have put this file in the wrong directory.
 
 ## Building the Application    
 
