@@ -38,26 +38,38 @@ If you have already built and need to rebuild the application, use the command
 
 ###Just Compiling   
 
-To just compile, use the command:     
+To just compile, use the command:
+     
 				ant compile     
+
 To clean and compile please use:           
+
 				ant clean compile	    	
 
 ###Running Application
       
-To run the application, use the command          
+To run the application, use the command     
+     
 				ant run    
+
 OR        
+
 				ant clean run   
 
 ###One Stop Command To Run    
 
-To simply do all the above with one command, use:       
+To simply do all the above with one command, use:   
+    
 				ant     
+
 OR       
-				ant run     
+
+				ant run 
+    
 OR       
+
 				ant clean run  
+
 
 
 ## License
