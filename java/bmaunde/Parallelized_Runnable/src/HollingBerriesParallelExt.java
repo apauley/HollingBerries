@@ -50,7 +50,7 @@ public class HollingBerriesParallelExt {
     private volatile StringBuffer outputStr = new StringBuffer();
     
     private final String produceFile = System.getProperty("user.dir") + File.separator+ "produce.csv";
-    private final String priceFile = System.getProperty("user.dir") + File.separator+ "prices.csv";
+    private final String priceFile = System.getProperty("user.dir") + File.separator+ "pricefile.txt";
       
     private final char separator = ',';
     private final char replacement = '`';
@@ -132,8 +132,7 @@ public class HollingBerriesParallelExt {
     private void printPrices(StringBuffer outputStr) {
 
         try (PrintWriter print = new PrintWriter(new FileWriter(priceFile))) {
-
-            print.println(outputStr.toString());
+            print.println((outputStr.toString()).substring(0, (outputStr.toString()).length()-1));
 
           } catch (IOException e) {
 
@@ -158,6 +157,7 @@ public class HollingBerriesParallelExt {
 
             Product produceProd;
             String outputSt;
+            String format = "%8.2f";
             
             //System.out.println("Thread :"+ Thread.currentThread().getName());
             String pLine = removeExtraSeparators(produceLine, separator, replacement);
@@ -172,9 +172,9 @@ public class HollingBerriesParallelExt {
             outputSt = "";
 
             for (int k = 0; k < produceProd.getUnits(); k++) {
-
-                outputSt += "R" + df.format(produceProd.getSellingPrice()) + " " + fmt.format(produceProd.getSellByDate())
-                        + " " + produceProd.getDescription().substring(0, p) + "\n";
+                float doubleConv = Float.parseFloat(df.format(produceProd.getSellingPrice()));
+                   outputSt += "R" + String.format(format,doubleConv) + fmt.format(produceProd.getSellByDate()) 
+                           + produceProd.getDescription().substring(0, 31) + "\n";
 
             }
             outputStr.append(outputSt);
@@ -231,7 +231,7 @@ public class HollingBerriesParallelExt {
             sellingPrice = Double.parseDouble(df.format(sellingPrice));
 
             if (primeSuppliers.containsValue(Integer.toString(supID))) {
-                df.format(Math.ceil(sellingPrice));
+                sellingPrice = Double.parseDouble(df.format(Math.ceil(sellingPrice)));
             }
 
             if (badSuppliers.containsValue(Integer.toString(supID))) {

@@ -46,12 +46,14 @@ public class HollingBerries {
     
     //input and output files
     private String produceFile = System.getProperty("user.dir") + File.separator+ "produce.csv";
-    private String priceFile = System.getProperty("user.dir") + File.separator+ "prices.csv";
+    private String priceFile = System.getProperty("user.dir") + File.separator+ "pricefile.txt";
     
     //formatting objects
     DecimalFormat df = new DecimalFormat("0.00");
     GregorianCalendar gc = new GregorianCalendar();
     DateFormat fmt = new SimpleDateFormat("yyyy/MM/dd");
+    String format = "%8.2f";
+    float doubleConv;
 
     //main execution block
     public static void main(String[] args) {
@@ -181,7 +183,7 @@ public class HollingBerries {
 
         //what about prime rate rules
         if (primeSuppliers.containsValue(Integer.toString(supID))) {
-            df.format(Math.ceil(sellingPrice));
+           sellingPrice =  Double.parseDouble(df.format(Math.ceil(sellingPrice)));
         }
 
         //what abt the bad supplier rules?
@@ -218,15 +220,12 @@ public class HollingBerries {
         //loop through products
         while (n < products.size()) {
             tmpProd = products.get(n);
-            int len = tmpProd.getDescription().length();
-                 //changed formatting - remove spacing between R and amount
-                //put a space between all the attributes
-            p = (len >= 29)? 29:len;
                
             if (tmpProd.getUnits() > 0 && tmpProd != null) {
                 //now for the actual formatting
                 for (int k = 0; k < tmpProd.getUnits(); k++) {
-                   outputStr += "R" + df.format(tmpProd.getSellingPrice()) + " " + fmt.format(tmpProd.getSellByDate()) + " " + tmpProd.getDescription().substring(0, p) + "\n";
+                    doubleConv = Float.parseFloat(df.format(tmpProd.getSellingPrice()));
+                   outputStr += "R" + String.format(format,doubleConv) + fmt.format(tmpProd.getSellByDate()) + tmpProd.getDescription().substring(0, 31) + "\n";
                 }
             }
             n = n + 1;
@@ -235,7 +234,7 @@ public class HollingBerries {
         //now write to the file
         try (PrintWriter print = new PrintWriter(new FileWriter(priceFile))) {
 
-            print.println(outputStr);
+            print.println(outputStr.substring(0, outputStr.length()-1));
         } catch (IOException e) {
             e.printStackTrace();
         }

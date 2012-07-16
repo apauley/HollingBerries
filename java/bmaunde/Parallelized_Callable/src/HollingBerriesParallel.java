@@ -24,10 +24,10 @@ public class HollingBerriesParallel {
     private String outputStr;
     
     private String produceFile = System.getProperty("user.dir") + File.separator+ "produce.csv";
-    private String priceFile = System.getProperty("user.dir") + File.separator+ "prices.csv";
+    private String priceFile = System.getProperty("user.dir") + File.separator+ "pricefile.txt";
     
 
-    DecimalFormat df = new DecimalFormat("0.00");
+    DecimalFormat df = new DecimalFormat("00000.00");
     GregorianCalendar gc = new GregorianCalendar();
     DateFormat fmt = new SimpleDateFormat("yyyy/MM/dd");
 
@@ -104,7 +104,8 @@ public class HollingBerriesParallel {
                 outputStr += result.get();
                 
             }
-            print.println(outputStr);
+//            outputStr = outputStr.length()>2?outputStr.substring(0, (outputStr.length()-1)):outputStr;
+            print.println(outputStr.substring(0, outputStr.length()-1));
             
         } catch (IOException | InterruptedException | ExecutionException e) {
             
@@ -143,6 +144,7 @@ class do_Fill implements Callable<String> {
         
         Product produceProd;
         String outputStr;
+        String format = "%8.2f";
         
         String pLine = removeExtraSeparators(produceLine, separator, replacement);
         
@@ -150,15 +152,12 @@ class do_Fill implements Callable<String> {
         
         produceProd = doFill(prodAtttr);
 
-        int len = produceProd.getDescription().length();
-        
-        int p = (len >= 29) ? 29 : len;
         outputStr = "";
         
         for (int k = 0; k < produceProd.getUnits(); k++) {
-            
-            outputStr += "R" + df.format(produceProd.getSellingPrice()) + " " + fmt.format(produceProd.getSellByDate()) + 
-                    " " + produceProd.getDescription().substring(0, p) + "\n";
+            float doubleConv = Float.parseFloat(df.format(produceProd.getSellingPrice()));
+            outputStr += "R" + String.format(format,doubleConv) + fmt.format(produceProd.getSellByDate()) 
+                           + produceProd.getDescription().substring(0, 31)+"\n";
             
         }
 
@@ -216,7 +215,7 @@ class do_Fill implements Callable<String> {
         sellingPrice = Double.parseDouble(df.format(sellingPrice));
 
         if (primeSuppliers.containsValue(Integer.toString(supID))) {
-            df.format(Math.ceil(sellingPrice));
+            sellingPrice = Double.parseDouble(df.format(Math.ceil(sellingPrice)));
         }
 
         if (badSuppliers.containsValue(Integer.toString(supID))) {

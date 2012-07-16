@@ -1,12 +1,5 @@
 # A Java Implementation of the HollingBerries Scenario
 ## The Parallelized Version - By Brian Maunde
-
-**Notes:**
-
-
-*	I broke the rules a bit and in this way - my ouput is arranged as follows using 29 characters from the description, combining the curreny indicator(R) and the selling price whilst putting spaces between the three components selling price, sellby-date and description. Also, the output is in csv format:
-
-    	R21.07 2012/02/29 Apples 1kg Golden Delicious.
  
 
 ##Requirements

@@ -10,11 +10,6 @@
   
 	The first allows a faster run - depending on machine specs - but distorts the output file on a product type to product type basis but products represented by a single line in the input file will be arranged together.  
 	The second one is a slower than the first but provides output that is arranged in accordance with the sequence in the input file.
-
-	
-*	I broke the rules a bit and in this way - my ouput is arranged as follows using 29 characters from the description, combining the curreny indicator(R) and the selling price whilst putting spaces between the three components selling price, sellby-date and description. Also, the output is in csv format:
-
-    	R21.07 2012/02/29 Apples 1kg Golden Delicious.
  
 
 ##Requirements
