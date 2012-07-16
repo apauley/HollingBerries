@@ -104,7 +104,6 @@ public class HollingBerriesParallel {
                 outputStr += result.get();
                 
             }
-//            outputStr = outputStr.length()>2?outputStr.substring(0, (outputStr.length()-1)):outputStr;
             print.println(outputStr.substring(0, outputStr.length()-1));
             
         } catch (IOException | InterruptedException | ExecutionException e) {

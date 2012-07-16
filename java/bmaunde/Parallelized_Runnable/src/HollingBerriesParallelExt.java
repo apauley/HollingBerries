@@ -166,9 +166,6 @@ public class HollingBerriesParallelExt {
 
             produceProd = doFill(prodAtttr);
 
-            int len = produceProd.getDescription().length();
-
-            int p = (len >= 29) ? 29 : len;
             outputSt = "";
 
             for (int k = 0; k < produceProd.getUnits(); k++) {

@@ -53,7 +53,6 @@ public class HollingBerries {
     GregorianCalendar gc = new GregorianCalendar();
     DateFormat fmt = new SimpleDateFormat("yyyy/MM/dd");
     String format = "%8.2f";
-    float doubleConv;
 
     //main execution block
     public static void main(String[] args) {
@@ -224,7 +223,7 @@ public class HollingBerries {
             if (tmpProd.getUnits() > 0 && tmpProd != null) {
                 //now for the actual formatting
                 for (int k = 0; k < tmpProd.getUnits(); k++) {
-                    doubleConv = Float.parseFloat(df.format(tmpProd.getSellingPrice()));
+                    float doubleConv = Float.parseFloat(df.format(tmpProd.getSellingPrice()));
                    outputStr += "R" + String.format(format,doubleConv) + fmt.format(tmpProd.getSellByDate()) + tmpProd.getDescription().substring(0, 31) + "\n";
                 }
             }
