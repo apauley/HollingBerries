@@ -1,6 +1,7 @@
-USING: kernel io io.files accessors prettyprint alien.syntax csv io.encodings.utf8 grouping
-       sequences splitting calendar formatting locals combinators assocs continuations 
-       lexer parser math math.functions math.order math.parser ;
+USING: kernel io accessors prettyprint locals combinators assocs continuations 
+       sequences splitting calendar formatting io.files io.encodings.utf8 fry
+       alien.syntax csv grouping lexer parser math math.functions math.order 
+       math.parser ;
 
 IN: holling-berries
 
@@ -44,12 +45,6 @@ CONSTANT: code-table alist{
 : repeat ( n seq -- new-seq ) 
     [ ] curry replicate concat ;
 
-: trouble? ( x -- ? ) 
-    { 32 101 } member? ;
-
-: premium? ( x -- ? ) 
-    { 204 219 } member? ;
-
 : read-date ( str -- date ) 
     "/" split [ string>number ] map [ <date> ] apply ;
 
@@ -75,25 +70,27 @@ ALIAS: >n string>number
     [ call( x -- x ) ] 2map 
     [ <item> ] apply ;
 
+: trouble? ( item -- ? ) 
+    supplier>> { 32 101 } member? ;
+
+: premium? ( item -- ? ) 
+    supplier>> { 204 219 } member? ;
+
 : between?' ( range x -- ? ) 
     swap [ first ] [ second ] bi between? ;
 
-:: calculate ( item -- item' )
-    code-table [ second [ item code>> between?' ] any? ] find first :> kind
-    item supplier>> :> supplier
-    item price>> :> price
-    supplier trouble? :> tr
-    supplier premium? :> pr
-    kind markup-table at :> markup
-    kind shelf-table at :> shelf
-    pr [
-        markup 0.1 + price * ceiling 
-    ] [
-        markup price * tr 2 0 ? -  
-    ] if 0 max :> price'
-    item day>> shelf tr 3 0 ? - days time+ :> day'
-    item clone price' >>price day' >>day nip ;
+: item-kind ( item -- kind )
+    '[ second [ _ code>> between?' ] any? ] code-table swap find first nip ;
 
+:: calculate ( item -- item' )
+    item clone :> item'
+    item' { 
+        [ item-kind ] [ price>> ] [ trouble? ] [ premium? ] [ day>> ] 
+    } cleave :> ( k pr tr pm d )
+    k [ markup-table at ] [ shelf-table at ] bi :> ( mk sh )
+    item' pm [ mk 0.1 + pr * ceiling ] [ mk pr * tr 2 0 ? - ] if 0 max >>price
+          d sh tr 3 0 ? - days time+ >>day ;
+    
 : process ( csv -- str  )
     rest [ length 6 = ] filter [ read-item calculate present-item ] map concat  ;
 
