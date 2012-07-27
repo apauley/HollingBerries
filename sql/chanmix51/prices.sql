@@ -1,4 +1,7 @@
 -- price calculus SQL script
+\a
+\t
+
 BEGIN;
 CREATE SCHEMA import;
 SET search_path TO import, public;
