@@ -1,7 +1,6 @@
-USING: kernel io accessors prettyprint alien.syntax csv io.encodings.utf8 grouping
-       present sequences splitting calendar formatting locals combinators assocs
-       combinators continuations lexer parser math math.functions math.order
-       math.parser io.files ;
+USING: kernel io io.files accessors prettyprint alien.syntax csv io.encodings.utf8 grouping
+       sequences splitting calendar formatting locals combinators assocs continuations 
+       lexer parser math math.functions math.order math.parser ;
 
 IN: holling-berries
 
