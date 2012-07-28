@@ -94,7 +94,7 @@ C: <item> item
           d sh tr 3 0 ? - days time+ >>day ;
     
 : process ( csv -- str  )
-    rest [ length 6 = ] filter [ read-item calculate present-item ] map concat but-last ;
+    rest [ length 6 = ] filter [ read-item calculate present-item ] map concat ;
 
 :: holling-berries ( in out -- )
     out utf8 [
