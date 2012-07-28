@@ -9,7 +9,9 @@ To run the script, you need access to a  postgresql server in an existing databa
 
 ::
 
-    psql -X -q -o my_pricelist.txt < sql/chanmix51/prices.sql
+    psql database -U user -h host -X -q -o my_pricelist.txt < sql/chanmix51/prices.sql
+
+You can omit the database, user and host if you use the according environment variables (see psql manpage for details).
 
 The script will create a new schema named ``import`` in the database and create a ``produce`` table from the ``produce.csv`` file. Once the output has been sent, the schema and all it contains is destroyed.
 
