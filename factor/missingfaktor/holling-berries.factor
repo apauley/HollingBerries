@@ -1,11 +1,13 @@
 USING: kernel io accessors prettyprint locals combinators assocs continuations 
        sequences splitting calendar formatting io.files io.encodings.utf8 fry
        alien.syntax csv grouping lexer parser math math.functions math.order 
-       math.parser ;
+       math.parser sequences.generalizations ;
 
 IN: holling-berries
 
 << SYNTAX: alist{ \ } [ 2 group >alist ] parse-literal ; >>
+
+ALIAS: >n string>number
 
 ENUM: kind apple banana berry other ;
 
@@ -39,14 +41,11 @@ CONSTANT: code-table alist{
     }
 }
 
-: apply ( seq quot -- x ) 
-    with-datastack first ;
-
 : repeat ( n seq -- new-seq ) 
     [ ] curry replicate concat ;
 
 : read-date ( str -- date ) 
-    "/" split [ string>number ] map [ <date> ] apply ;
+    "/" split [ >n ] map first3 <date> ;
 
 : present-date ( date -- str ) 
     "%Y/%m/%d" strftime ; 
@@ -63,12 +62,15 @@ C: <item> item
         [ descript>> 31 head  ] tri "R%8.2f%10s%31s\n" sprintf
     ] bi repeat ;
 
-ALIAS: >n string>number
-
 : read-item ( seq -- item ) 
-    { [ >n ] [ >n ] [ ] [ read-date ] [ >n 100.0 / ] [ >n ] } 
-    [ call( x -- x ) ] 2map 
-    [ <item> ] apply ;
+    6 firstn
+    item new
+    swap >n >>units
+    swap >n 100.0 / >>price
+    swap read-date >>day
+    swap >>descript
+    swap >n >>code
+    swap >n >>supplier ;
 
 : trouble? ( item -- ? ) 
     supplier>> { 32 101 } member? ;
