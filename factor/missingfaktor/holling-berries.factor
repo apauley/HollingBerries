@@ -79,7 +79,7 @@ C: <item> item
     supplier>> { 204 219 } member? ;
 
 : between?' ( range x -- ? ) 
-    swap [ first ] [ second ] bi between? ;
+    swap first2 between? ;
 
 : item-kind ( item -- kind )
     '[ second [ _ code>> between?' ] any? ] code-table swap find first nip ;
