@@ -94,11 +94,11 @@ C: <item> item
           d sh tr 3 0 ? - days time+ >>day ;
     
 : process ( csv -- str  )
-    rest [ length 6 = ] filter [ read-item calculate present-item ] map concat  ;
+    rest [ length 6 = ] filter [ read-item calculate present-item ] map concat but-last ;
 
 : main ( -- )
     "pricefile.txt" utf8 
-    "produce.csv" utf8 file>csv process [ print ] curry 
+    "produce.csv" utf8 file>csv process [ "%s" printf ] curry 
     with-file-writer ;
     
 MAIN: main
