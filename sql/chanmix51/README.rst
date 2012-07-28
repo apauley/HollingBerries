@@ -39,7 +39,7 @@ The SQL statement to output the results works as follow. The starting structure 
 
 The first step is to generate on line per item with all information related to product type like markup and max sell date:
 
-    ::
+::
 
     produce_fruit (supplier_id, markup, price, max_sell_date, description, item_no) AS (
         SELECT 
