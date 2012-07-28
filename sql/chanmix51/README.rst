@@ -39,7 +39,7 @@ The SQL statement to output the results works as follow. The starting structure 
 
 The first step is to generate on line per item with all information related to product type like markup and max sell date:
 
-    ::
+::
 
     produce_fruit (supplier_id, markup, price, max_sell_date, description, item_no) AS (
         SELECT 
@@ -75,7 +75,7 @@ From this can be applied to rules related to the suppliers, hence the final pric
 
 The result is a set containing all we need for the output string: final price, max sell date and description. It just needs to be formatted:
 
-    ::
+::
 
     SELECT 'R'||substr(to_char(price, '99990.00'), 2)||to_char(max_sell_date, 'YYYY/MM/DD')||substr(description,1 ,31) FROM produce_supplier;
 
