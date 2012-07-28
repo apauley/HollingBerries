@@ -12,9 +12,11 @@ Note that Factor is still in its infancy and breaking changes occur quite often.
 
 In your Factor installation directory, there should be an executable file named "factor". That's "Listener", Factor's REPL. Run that, and type the following:
 
-    ! Enter appropriate paths below.
-    "path/to/holling-berries.factor" run-file
-    USE: holling-berries
-    "path/to/produce.csv" "path/to/output/file" holling-berries
+```factor
+! Enter appropriate paths below.
+"path/to/holling-berries.factor" run-file
+USE: holling-berries
+"path/to/produce.csv" "path/to/output/file" holling-berries
+```
 
 You should see an output file created at the specified output path.
