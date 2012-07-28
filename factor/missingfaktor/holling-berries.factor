@@ -96,9 +96,7 @@ C: <item> item
 : process ( csv -- str  )
     rest [ length 6 = ] filter [ read-item calculate present-item ] map concat but-last ;
 
-: main ( -- )
-    "pricefile.txt" utf8 
-    "produce.csv" utf8 file>csv process [ "%s" printf ] curry 
-    with-file-writer ;
-    
-MAIN: main
+:: holling-berries ( in out -- )
+    out utf8 [
+      in utf8 file>csv process "%s" printf
+    ] with-file-writer ;
