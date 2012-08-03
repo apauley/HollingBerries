@@ -95,17 +95,14 @@ $rows = getRows();
 ob_start();
 
 $lines = file(__DIR__.'/../../pricefile.txt');
-$k = 0;
 
-foreach($rows as $i => $row) {
+foreach($rows as $row) {
 
     $sellingPrice = getSellingPrice($row['Product Code'], $row['Supplier ID'], $row['Unit Price'] / 100);
     $sellByDate = getSellByDate($row['Product Code'], $row['Supplier ID'], $row['Delivery Date']);
     $productDescription = substr($row['Product Description'], 0, 31);
 
-    for ($j = 0; $j < $row['Number of Units']; $j++) {
-        printf("R%8.2f%s%s\n", $sellingPrice, $sellByDate, $productDescription);
-    }
+    echo str_repeat(sprintf("R%8.2f%s%s\n", $sellingPrice, $sellByDate, $productDescription), $row['Number of Units']);
 }
 
 $data = ob_get_clean();
