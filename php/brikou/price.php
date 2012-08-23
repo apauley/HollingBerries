@@ -78,7 +78,7 @@ function getSellByDate($productCode, $supplierId, $deliveryDate)
         default:
             $time = '1 week';
             break;
-    }    
+    }
 
     $sellByDate = DateTime::createFromFormat('Y/m/d', $deliveryDate);
     $sellByDate->add(DateInterval::createFromDateString($time));
@@ -89,6 +89,8 @@ function getSellByDate($productCode, $supplierId, $deliveryDate)
 
     return $sellByDate->format('Y/m/d');
 }
+
+ini_set('date.timezone', 'UTC');
 
 $rows = getRows();
 
