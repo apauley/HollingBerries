@@ -9,78 +9,93 @@
 
 ;;; Commentary:
 
-;; This program converts a file in csv format into labels.
+;; This program was written for the HollingBerries Challenge
+;; Details here: https://github.com/apauley/HollingBerries
 
-(defconst in "produce.csv" "Location for the data file")
-(defconst out "pricefile.txt" "Location for the label file")
+(defconst label "R%8.2f%s%.31s\n" "Label format")
+(defconst poor-suppliers '("32" "101") "Susan, Togetherness")
+(defconst premium-suppliers '("219" "204") "Promise, Karel")
 
-(defconst poor '("32" "101") "Poor supplier")
-(defconst premium '("219" "204") "Premium suppliers")
+(defun fruit (code)
+  (cond
+   ((betweenp code 1100 1199) 'apples)
+   ((betweenp code 1200 1299) 'bananas)
+   ((betweenp code 1300 1399) 'berries)))
 
-(defun lookup (key alist default)
+(defun betweenp (x low high)
+  (and (>= x low) (<= x high)))
+
+(defun lookup (code alist default)
   "Lookup value based on key and return default value if no match."
-  (or (cdr (assq key alist)) default))
+  (or (cdr (assq (fruit code) alist)) default))
 
-(defun markup (fruit)
+(defun markup (code)
   "Return cost to price multiplier"
-  (lookup fruit '((berries . 1.55) (bananas . 1.35) (apples . 1.40)) 1.50))
+  (lookup code '((berries . 1.55) (bananas . 1.35) (apples . 1.40)) 1.50))
 
-(defun lasts (fruit)
+(defun lasts (code)
   "Return how long a fruit lasts in days"
-  (lookup fruit '((bananas . 5) (apples . 14)) 7))
+  (lookup code '((bananas . 5) (apples . 14)) 7))
 
-(defun read-lines (file)
-  "Return a list of lines in a file"
-  (with-temp-buffer
-    (insert-file-contents file)
-    (buffer-string)))
+(defun price (code supplier cost)
+  (if (member supplier premium-suppliers)
+      (ceiling (* cost (markup code) 1.1))
+    (* cost (markup code))))
 
+(defun date-only-to-time (date)
+  "Convert from date (YYYY/MM/DD) to Elisp time"
+  (date-to-time (concat (replace-regexp-in-string "/" "-" date) " 00:00:00")))
 
-(defun transform (inputFile outputFile)
-  (let ((moreLines t))
-    (find-file outputFile)
-    (erase-buffer)
-    (find-file inputFile)
-    (goto-char 1)
-    (while moreLines
-      
-      (find-file outputFile)
-      (insert "mikkel\n")
-      (save-buffer)
-      (setq moreLines (zerop (forward-line 1)))
-      )))
+(defun date-add (date days)
+  "Add the given number of days to the date (YYYY/MM/DD)"
+  (let ((result (time-add
+                 (date-only-to-time date)
+                 (seconds-to-time (* days 24 60 60)))))
+    (format-time-string "%Y/%m/%d" result)))
 
-;; (search-forward "(")
+(defun sell-by (code supplier date)
+  "Return the sell-by date for a fruit"
+  (if (member supplier poor-suppliers)
+      (date-add date (- (lasts code) 3)))
+  (date-add date (lasts code)))
 
-;; (setq splitPos (1- (point)))
-;; (beginning-of-line)
-;; (setq fName (buffer-substring-no-properties (point) splitPos))
+(defun create-labels (line)
+  (let* ((supplier (first line))
+         (code (string-to-int (second line)))
+         (desc (third line))
+         (delivered (fourth line))
+         (sell-by (sell-by code supplier delivered))
+         (cost (/ (string-to-int (fifth line)) 100.0))
+         (price (price code supplier cost))
+         (amount (string-to-int (sixth line))))
+    (apply 'concat
+           (make-list amount
+                      (format label price sell-by desc)))))
 
-;; (end-of-line)
-;; (setq restLine (buffer-substring-no-properties splitPos (point) ))
-
-;; ;; create the file
-;; (find-file fName)
-;; (insert "# --\n")
-;; (insert fName restLine "\n{\n$0\n}" )
-;; (save-buffer)
-;; (kill-buffer (current-buffer))
-
-;; (setq moreLines (= 0 (forward-line 1)))
-
-
-;(mapcar (lambda (line) (split-string line ",")) *data*)
-
-(defconst *data* (read-lines in))
-
+(defun get-product ()
+  (split-string-and-unquote
+   (buffer-substring (line-beginning-position)
+                     (line-end-position)) "[,\n]"))
 
 (defun berries-pricelist (filename)
   "Can be called interactively e.g. `M-x berries-pricelist'
    and will prompt for the `produce.csv' file then create
    `pricelist.txt' in the same directory."
   (interactive "fproduce.csv file: ")
-  (transform filename out))
+  (save-excursion
+    (let ((out-file "pricelist.txt")
+          (in-file ""))
+      (find-file out-file) ;TODO: use 'find-file-noselect?
+      (erase-buffer)
+      (with-temp-buffer
+        (insert-file-contents filename)
+        (setq in-file (current-buffer))
+        (while (not (eobp))
+          (forward-line 1)
+          (setq product (get-product))
+          (find-file out-file)
+          (insert (create-labels product))
+          (save-buffer)
+          (set-buffer in-file))))))
 
-(ert-deftest diff-test ()
-    (should t))
-
+(provide 'berries)
