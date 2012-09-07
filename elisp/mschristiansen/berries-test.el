@@ -26,4 +26,6 @@
 
 (ert-deftest test-create-labels ()
   (should (string= "R   21.072012/02/29Apples 1kg Golden Delicious. Th\n"
-                   (create-labels '("15" "1101" "Apples 1kg Golden Delicious. The sweetest Apples! Always a favourite. Love, Mrs. Hollingberry" "2012/02/15" "1505" "1")))))
+                   (create-labels '("15" "1101" "Apples 1kg Golden Delicious. The sweetest Apples! Always a favourite. Love, Mrs. Hollingberry" "2012/02/15" "1505" "1"))))
+  (should (string= "R   18.032012/02/27Apples 1kg Red. Less crunchy th\n"
+                   (create-labels '("32" "1103" "Apples 1kg Red. Less crunchy than the green ones, that's for sure. I prefer these myself nowadays. Love, Mrs. Hollingberry" "2012/02/16" "1431" "1")))))

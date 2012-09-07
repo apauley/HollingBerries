@@ -38,9 +38,10 @@
   (lookup code '((bananas . 5) (apples . 14)) 7))
 
 (defun price (code supplier cost)
-  (if (member supplier premium-suppliers)
-      (ceiling (* cost (markup code) 1.1))
-    (* cost (markup code))))
+  (cond
+   ((member supplier premium-suppliers) (ceiling (* cost (markup code) 1.1)))
+   ((member supplier poor-suppliers) (- (* cost (markup code)) 2))
+   (t (* cost (markup code)))))
 
 (defun date-only-to-time (date)
   "Convert from date (YYYY/MM/DD) to Elisp time"
@@ -56,8 +57,8 @@
 (defun sell-by (code supplier date)
   "Return the sell-by date for a fruit"
   (if (member supplier poor-suppliers)
-      (date-add date (- (lasts code) 3)))
-  (date-add date (lasts code)))
+      (date-add date (- (lasts code) 3))
+    (date-add date (lasts code))))
 
 (defun create-labels (line)
   (let* ((supplier (first line))
@@ -68,6 +69,7 @@
          (cost (/ (string-to-int (fifth line)) 100.0))
          (price (price code supplier cost))
          (amount (string-to-int (sixth line))))
+    (print (list supplier code desc delivered sell-by cost price amount))
     (apply 'concat
            (make-list amount
                       (format label price sell-by desc)))))
@@ -77,25 +79,25 @@
    (buffer-substring (line-beginning-position)
                      (line-end-position)) "[,\n]"))
 
-(defun berries-pricelist (filename)
+(defun berries-pricefile (filename)
   "Can be called interactively e.g. `M-x berries-pricelist'
    and will prompt for the `produce.csv' file then create
    `pricelist.txt' in the same directory."
   (interactive "fproduce.csv file: ")
+  (message "Generating labels ...")
   (save-excursion
-    (let ((out-file "pricelist.txt")
-          (in-file ""))
-      (find-file out-file) ;TODO: use 'find-file-noselect?
+    (let ((out-file "pricefile.txt"))
+      (find-file out-file)
       (erase-buffer)
       (with-temp-buffer
         (insert-file-contents filename)
         (setq in-file (current-buffer))
-        (while (not (eobp))
-          (forward-line 1)
+        (while (zerop (forward-line 1))
           (setq product (get-product))
-          (find-file out-file)
-          (insert (create-labels product))
-          (save-buffer)
-          (set-buffer in-file))))))
+          (set-buffer out-file)
+          (when product
+            (insert (create-labels product)))
+          (set-buffer in-file)))))
+  (message "Labels created!"))
 
 (provide 'berries)
