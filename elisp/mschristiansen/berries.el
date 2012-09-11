@@ -14,7 +14,7 @@
 
 (defconst label "R%8.2f%s%.31s\n" "Label format")
 (defconst poor-suppliers '("32" "101") "Susan, Togetherness")
-(defconst premium-suppliers '("219" "204") "Promise, Karel")
+(defconst premium-suppliers '("219" "204") "Karel, Promise")
 
 (defun fruit (code)
   (cond
@@ -39,8 +39,9 @@
 
 (defun price (code supplier cost)
   (cond
-   ((member supplier premium-suppliers) (ceiling (* cost (markup code) 1.1)))
-   ((member supplier poor-suppliers) (- (* cost (markup code)) 2))
+   ((member supplier premium-suppliers) (ceiling (* cost (+ (markup code) 0.1))))
+   ((member supplier poor-suppliers) (let ((price (- (* cost (markup code)) 2)))
+                                       (if (> 0 price) 0 price)))
    (t (* cost (markup code)))))
 
 (defun date-only-to-time (date)
@@ -49,9 +50,8 @@
 
 (defun date-add (date days)
   "Add the given number of days to the date (YYYY/MM/DD)"
-  (let ((result (time-add
-                 (date-only-to-time date)
-                 (seconds-to-time (* days 24 60 60)))))
+  (let ((result (time-add (date-only-to-time date)
+                          (seconds-to-time (* days 24 60 60)))))
     (format-time-string "%Y/%m/%d" result)))
 
 (defun sell-by (code supplier date)
@@ -69,7 +69,6 @@
          (cost (/ (string-to-int (fifth line)) 100.0))
          (price (price code supplier cost))
          (amount (string-to-int (sixth line))))
-    (print (list supplier code desc delivered sell-by cost price amount))
     (apply 'concat
            (make-list amount
                       (format label price sell-by desc)))))
@@ -84,20 +83,18 @@
    and will prompt for the `produce.csv' file then create
    `pricelist.txt' in the same directory."
   (interactive "fproduce.csv file: ")
-  (message "Generating labels ...")
-  (save-excursion
-    (let ((out-file "pricefile.txt"))
-      (find-file out-file)
-      (erase-buffer)
-      (with-temp-buffer
-        (insert-file-contents filename)
-        (setq in-file (current-buffer))
-        (while (zerop (forward-line 1))
-          (setq product (get-product))
-          (set-buffer out-file)
-          (when product
-            (insert (create-labels product)))
-          (set-buffer in-file)))))
+  (let ((out-file "pricefile.txt"))
+    (find-file out-file)
+    (erase-buffer)
+    (with-temp-buffer
+      (insert-file-contents filename)
+      (setq in-file (current-buffer))
+      (while (zerop (forward-line 1))
+        (setq product (get-product))
+        (set-buffer out-file)
+        (when product
+          (insert (create-labels product)))
+        (set-buffer in-file))))
   (message "Labels created!"))
 
 (provide 'berries)
