@@ -1,107 +1,36 @@
 (ns berry.core
-  (:use [clojure.java.io :only [reader]]
-        [clojure.data.csv :only [read-csv]]
+  (:use [clojure.data.csv :only [read-csv]]
         [clj-time.core :only [plus days]]
         [clj-time.format :only [formatter parse unparse]]))
 
-;;; Define file locations and parse the file
-;;; 
-(def in-file "../../produce.csv")
-(def out-file "pricefile.txt")
+(defn lookup [code attr]
+  (attr (condp < code
+          1300 {:markup 1.55 :lasts (days 7)}  ; Berries
+          1200 {:markup 1.35 :lasts (days 5)}  ; Bananas
+          1100 {:markup 1.40 :lasts (days 14)} ; Apples
+          {:markup 1.50 :lasts (days 7)})))    ; Default
 
-(def items
-  (drop 1  ;Leave headers out.
-        (with-open [file (reader in-file)]
-            (doall
-             (read-csv file)))))
+(def trouble #{"32" "101"})             ; Susan, Togetherness
+(def premium #{"219" "204"})            ; Promise, Karel
 
+(defn price [cost code supplier]
+  (let [price (* cost (lookup code :markup))]
+    (cond (neg? (- price 2)) 0.0
+          (trouble supplier) (- price 2)
+          (premium supplier) (Math/ceil (+ price (* cost 0.10)))
+          :else price)))
 
-(defn sell-by-date-for
-  "Return the sell-by-date based on category keyword"
-  [category]
-  (condp = category
-    :apples (days 14)
-    :bananas (days 5)
-    (days 7)))
+(defn sell-by [delivery code supplier]
+  (let [fmt (formatter "yyyy/MM/dd")
+        date (plus (parse fmt delivery) (lookup code :lasts))]
+    (unparse fmt (if (trouble supplier) (plus date (days -3)) date))))
 
-(defn markup-for
-  "Return markup based on category keyword"
-  [category]
-  (condp = category
-    :apples 1.40
-    :bananas 1.35
-    :berries 1.55
-    1.50))
-
-(defn lookup-number
-  "Helper function to lookup a number in the item sequence."
-  [item index]
-  (Integer/parseInt (nth item index)))
-
-(defn get-product-category
-  "Return category keyword based on product code."
-  [item]
-  (let [product-code (lookup-number item 1)]
-    (condp < product-code
-      1300 :berries
-      1200 :bananas
-      1100 :apples
-      1000 :fruit)))
-
-;;; Getting the sales price
-;;; 
-(defn calculate-price
-  "Calculate price based on category and format result"
-  [item]
-  (let [category (get-product-category item)
-        cost (lookup-number item 4)]
-    (str "R"
-         (format "%8.2f"
-                 (* (markup-for category) (/ cost 100))))))
-
-;;; Getting the date
-;;; 
-(def date-format (formatter "yyyy/MM/dd"))
-
-(defn lookup-date
-  "Helper function to lookup and format the date from an item."
-  [item]
-  (parse date-format (nth item 3)))
-
-(defn poor-supplier
-  "Check if supplier no. 32 and allow for 3 extra days."
-  [item]
-  (let [supplier (lookup-number item 0)]
-    (if (= supplier 32) (days -3) (days 0))))
-
-(defn calculate-sell-by-date
-  "Calculate the sell-by-date based on category, delivery date and
-  supplier quality"
-  [item]
-  (let [category (get-product-category item)
-        category-days (sell-by-date-for category)
-        delivery-date (lookup-date item)
-        special-case (poor-supplier item)]
-    (unparse date-format
-             (plus delivery-date category-days special-case))))
-
-;;; Writing to the file in the correct format
-;;;
-
-(defn include-description
-  "Take substring of length 31 from item description"
-  [item]
-  (subs (nth item 2) 0 31))
-
-(defn create-tags
-  "Concatenate the strings together and add end-of-line."
-  [item]
-  (let [tags (lookup-number item 5)]
-    (repeat tags
-            (str (calculate-price item)
-                 (calculate-sell-by-date item)
-                 (include-description item)
-                 "\n"))))
+(defn create-tags [s [supplier code desc delivery cost amount]]
+  (let [p (price (* (Integer. cost) 0.01) (Integer. code) supplier)
+        d (sell-by delivery (Integer. code) supplier)]
+    (apply str s (repeat (Integer. amount)
+                         (format "R%8.2f%s%.31s\n" p d desc)))))
 
 (defn -main []
-  (spit out-file (doall (reduce str (mapcat create-tags items)))))
+  (with-open [file (clojure.java.io/reader "../../produce.csv")]
+    (spit "pricefile.txt" (reduce create-tags "" (rest (read-csv file))))))
