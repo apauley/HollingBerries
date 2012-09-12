@@ -1,0 +1,6 @@
+* Holling Berries Challenge in Emacs Lisp
+
+Open berries.el in GNU Emacs and evaluate the buffer with 'C-c v' Then
+run 'M-x berries-pricefile' and give the produce.csv file. The program
+will create a new buffer named pricefile.txt with the labels.
+
