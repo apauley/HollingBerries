@@ -1,8 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Microsoft.VisualBasic.FileIO;
 using System.Linq;
+using Com.StellmanGreene.CSVReader;
+using System.Data;
 
 namespace HollingBerries
 {
@@ -88,33 +89,23 @@ namespace HollingBerries
     {
         public IEnumerable<ProduceItem> Parse(string path)
         {
-            var parser = new TextFieldParser(path); 
-            parser.TextFieldType = FieldType.Delimited;
-            parser.SetDelimiters(",");
-            var ignoreHeaders = true;
+            var data = CSVReader.ReadCSVFile(path, true);
 
-            while(!parser.EndOfData)
-            {
-                var fields = parser.ReadFields();
-
-                if (ignoreHeaders) { ignoreHeaders = false; continue; }
-
-                yield return new ProduceItem(
-                    int.Parse( fields[0] ),
-                    int.Parse( fields[1] ),
-                    fields[2],
-                    DateTime.Parse(fields[3]),
-                    double.Parse( fields[4] )/100, 
-                    int.Parse( fields[5] ) 
-                    );
-                
-            }
-
-            parser.Close();
+            return 
+                from DataRow row 
+                in data.Rows 
+                select new ProduceItem(
+                    int.Parse(row[0].ToString()),
+                    int.Parse(row[1].ToString()),
+                    row[2].ToString(),
+                    DateTime.Parse(row[3].ToString()),
+                    double.Parse(row[4].ToString()) / 100,
+                    int.Parse(row[5].ToString()) 
+                );
         }
     }
 	
-	 public class ProduceItem
+	public class ProduceItem
     {
         public ProduceItem(int supplierId, int productCode, string productDescription, DateTime deliveryDate, double unitPrice,  int numberOfUnits)
         {
