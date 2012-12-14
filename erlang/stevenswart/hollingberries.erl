@@ -73,7 +73,7 @@ for_loop(N, Length, _Inc, _SellPrice, _Year, _Month, _Day, _ProductDescription, 
 
 for_loop(N, Length, _Inc, SellPrice, Year, Month, Day, ProductDescription, Io_device) ->
   %% io:format("R~8.2f~B/~2..0B/~2..0B~s~n",[SellPrice,Year,Month,Day,ProductDescription]),
-   OutputLine = io_lib:format("R~8.2f~B/~2..0B/~2..0B~s\r~n",[SellPrice,Year,Month,Day,ProductDescription]),
+   OutputLine = io_lib:format("R~8.2f~B/~2..0B/~2..0B~s~n",[SellPrice,Year,Month,Day,ProductDescription]),
    io:format(OutputLine),
    file:write(Io_device,OutputLine),
    for_loop(N+_Inc, Length, _Inc, SellPrice, Year, Month, Day, ProductDescription, Io_device).
