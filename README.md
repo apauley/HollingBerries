@@ -121,12 +121,15 @@ The suppliers already took care of the nice packaging, you now have to
 make it expensive. Anything supplied by a Premium Produce (tm)
 supplier gets an additional 10% markup, and then the price is rounded
 up to the nearest Rand.
-For example, if a product costs R25.11 after the extra 10% markup has
+
+For example, a product that would usually have a 50% markup would now have a 60% markup.
+(It would be incorrect to first apply a 50% markup and then apply another 10% on top of that).
+If a product costs R25.11 after the extra 10% markup has
 been applied, you need to round it up to R26.
+
 The Premium Produce suppliers currently are:
 *   Promise Mashangu (Supplier ID 219)
 *   Karel Visser (Supplier ID 204)
-
 
 How do I contribute my solution?
 ================================
