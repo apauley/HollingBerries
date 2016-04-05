@@ -1,6 +1,10 @@
 extern crate csv;
 extern crate rustc_serialize;
-extern crate core;
+extern crate chrono;
+
+use chrono::*;
+use std::fs::File;
+use std::io::prelude::*;
 
 // ******** Business rules data ********
 enum Produce { Apple, Banana, Berry, Other }
@@ -32,6 +36,16 @@ fn produce_type(produce: &ProduceRecord) -> usize {
 	}
 }
 
+// Delivery times for various produce
+fn delivery_days(produce: &ProduceRecord) -> i64 {
+	match produce.product_code {
+		1100...1199 => 14,
+		1200...1299 => 5,
+		_ => 7
+	}
+}
+
+
 // ******** Application code ********
 
 #[derive(RustcDecodable)]
@@ -45,13 +59,33 @@ struct ProduceRecord {
 }
 
 fn getSellPrice(produce: &ProduceRecord) -> f32 {
-	let price = (produce.unit_price as f32) / 100.0;
+	let price = produce.unit_price as f32;
 	let prod_type = produce_type(&produce);
-	price * MARKUP[prod_type].1
+	let ret: f32 = if TROUBLE_SUPPLIERS.iter().any(|i| produce.supplier_id == *i) {
+		(price * MARKUP[prod_type].1 - 200.0)/ 100.0
+	} else if PREMIUM_SUPPLIERS.iter().any(|i| produce.supplier_id == *i) {
+		((price * (MARKUP[prod_type].1 + 0.1))/ 100.0).ceil()
+	} else {
+		(price * MARKUP[prod_type].1)/ 100.0
+	};
+	
+	ret.max(0.0)
 }
 
 fn getSellBy(produce: &ProduceRecord) -> String {
-	produce.delivery_day.clone()
+	let mut adj = delivery_days(produce);
+
+	if TROUBLE_SUPPLIERS.iter().any(|i| produce.supplier_id == *i) {
+		adj = adj - 3
+	};
+	
+	let day = produce.delivery_day.clone();
+	let date: String = " 00:00:00 +00:00".chars().enumerate().fold(day, |res, (i, ch)| {
+        res + &format!("{}", ch)
+    });
+	let dt = DateTime::parse_from_str(&date, "%Y/%m/%d %H:%M:%S %z")
+				.expect("Invalid date");
+	(dt + Duration::days(adj)).format("%Y/%m/%d").to_string()
 }
 
 fn processProduce(produce: ProduceRecord) -> String {
@@ -65,10 +99,14 @@ fn processProduce(produce: ProduceRecord) -> String {
 }
 
 fn main() {
+    let mut f: File = File::create("pricefile.txt").expect("Can't open output file!");
     let mut rdr = csv::Reader::from_file("../../produce.csv").unwrap();
     for record in rdr.decode() {
         let record: ProduceRecord = record.unwrap();
         let output = processProduce(record);
-        if output.len() > 0 { println!("{}", output); }        
+        if output.len() > 0 { 
+        	f.write(output.as_bytes()); 
+        	f.write(b"\n");
+        }
     }
 }

@@ -9,3 +9,4 @@ name = "holling_berries"
 [dependencies]
 csv = "0.14"
 rustc-serialize = "0.3.19"
+chrono = "0.2"
