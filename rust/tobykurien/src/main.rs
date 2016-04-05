@@ -21,7 +21,7 @@ const SHELF_LIFE: [(Produce, u32); 4] = [
 const TROUBLE_SUPPLIERS: [u32; 2] = [ 32, 101 ];
 const PREMIUM_SUPPLIERS: [u32; 2] = [ 204, 219 ];
 
-// Map product code to Product type using pattern matching
+// Map product code to Produce type using pattern matching
 fn produce(product_code: u32) -> Produce {
 	match product_code {
 		1100...1199 => Produce::Apple,
@@ -43,11 +43,29 @@ struct ProduceRecord {
     units: u32
 }
 
+fn getSellPrice(produce: &ProduceRecord) -> f32 {
+	(produce.unit_price as f32) * 0.01	
+}
+
+fn getSellBy(produce: &ProduceRecord) -> String {
+	produce.delivery_day.clone()
+}
+
+fn processProduce(produce: ProduceRecord) -> String {
+	let lines: Vec<String> = (0..produce.units).map(|a| {
+		let mut desc: String = produce.product_desc.clone();
+		desc.truncate(31);
+		format!("R{:8.2}{}{}", getSellPrice(&produce), getSellBy(&produce), desc)
+	}).collect();
+	
+	lines.as_slice().join("\n")
+}
+
 fn main() {
     let mut rdr = csv::Reader::from_file("../../produce.csv").unwrap();
-
     for record in rdr.decode() {
         let record: ProduceRecord = record.unwrap();
-        println!("({}, {}): {}", record.supplier_id, record.product_code, record.product_desc);
+        let output = processProduce(record);
+        if output.len() > 0 { println!("{}", output); }        
     }
 }
