@@ -1,5 +1,6 @@
 extern crate csv;
 extern crate rustc_serialize;
+extern crate core;
 
 // ******** Business rules data ********
 enum Produce { Apple, Banana, Berry, Other }
@@ -22,12 +23,12 @@ const TROUBLE_SUPPLIERS: [u32; 2] = [ 32, 101 ];
 const PREMIUM_SUPPLIERS: [u32; 2] = [ 204, 219 ];
 
 // Map product code to Produce type using pattern matching
-fn produce(product_code: u32) -> Produce {
-	match product_code {
-		1100...1199 => Produce::Apple,
-		1200...1299 => Produce::Banana,
-		1300...1399 => Produce::Berry,
-		_ => Produce::Other
+fn produce_type(produce: &ProduceRecord) -> usize {
+	match produce.product_code {
+		1100...1199 => Produce::Apple as usize,
+		1200...1299 => Produce::Banana as usize,
+		1300...1399 => Produce::Berry as usize,
+		_ => Produce::Other as usize
 	}
 }
 
@@ -40,11 +41,13 @@ struct ProduceRecord {
     product_desc: String,
     delivery_day: String,
     unit_price: u32,
-    units: u32
+    units: u32,
 }
 
 fn getSellPrice(produce: &ProduceRecord) -> f32 {
-	(produce.unit_price as f32) * 0.01	
+	let price = (produce.unit_price as f32) / 100.0;
+	let prod_type = produce_type(&produce);
+	price * MARKUP[prod_type].1
 }
 
 fn getSellBy(produce: &ProduceRecord) -> String {
