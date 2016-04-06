@@ -76,7 +76,7 @@ fn get_sell_by(produce: &ProduceRecord) -> String {
 }
 
 fn process_produce(produce: ProduceRecord) -> String {
-	(0..produce.units).map(|a| {
+	(0..produce.units).map(|_| {
 		let mut desc: String = produce.product_desc.clone();
 		desc.truncate(31);
 		format!("R{:8.2}{}{}\n", get_sell_price(&produce), get_sell_by(&produce), desc)
