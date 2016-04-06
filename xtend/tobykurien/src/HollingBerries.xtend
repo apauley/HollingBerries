@@ -25,10 +25,10 @@ import static extension com.google.common.io.CharStreams.*
 class HollingBerries {
     // Data for each type of produce: code range, markup, shelf life in days
     val produceData = #{
-        "Apples" ->  new ProduceData((1100 .. 1199), 1.40, 14),
+        "Apples"  -> new ProduceData((1100 .. 1199), 1.40, 14),
         "Bananas" -> new ProduceData((1200 .. 1299), 1.35, 5),
         "Berries" -> new ProduceData((1300 .. 1399), 1.55, 7),
-        "Other" ->   new ProduceData(null, 1.5, 7)
+        "Other"   -> new ProduceData(null          , 1.50, 7)
     }
 
     // supplier ratings
@@ -36,7 +36,7 @@ class HollingBerries {
     val premiumSuppliers = #[219, 204]
 
     val inDateFormat = new SimpleDateFormat("\"yyyy/MM/dd\"")
-    val outdateFormat = new SimpleDateFormat("yyyy/MM/dd")
+    val outDateFormat = new SimpleDateFormat("yyyy/MM/dd")
         
     def getProduceData(Product p) {
         produceData.values.findFirst[ codes == null || codes.contains(p.productCode) ]
@@ -71,12 +71,11 @@ class HollingBerries {
 
     // generate the label printer lines for each product
     def String processProduct(Product p) {
-        if (p.quantity <= 0) return ""
-        (0 .. p.quantity - 1).join("", [
+        (1 .. p.quantity).join("", [
             var sellPrice = Math.max(p.getSellPrice, 0.0)
             var sellBy = p.getSellBy
             var desc = p.description.substring(1, 32)
-            '''R«String::format("% 8.2f", sellPrice)»«outdateFormat.format(sellBy)»«desc»
+            '''R«String::format("% 8.2f", sellPrice)»«outDateFormat.format(sellBy)»«desc»
             '''.toString
         ])
     }
@@ -94,7 +93,7 @@ class HollingBerries {
                 Integer::parseInt(cols.next),
                 Integer::parseInt(cols.next)
             )
-            out.write(processProduct(product))
+            if (product.quantity > 0) out.write(processProduct(product))
         ]
         out.close
     }
