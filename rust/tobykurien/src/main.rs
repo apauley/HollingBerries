@@ -71,8 +71,7 @@ fn get_sell_by(produce: &ProduceRecord) -> String {
 	};
 	
 	let date = &format!("{} 00:00:00 +00:00", produce.delivery_day);
-	let dt = DateTime::parse_from_str(&date, "%Y/%m/%d %H:%M:%S %z")
-				.expect("Invalid date");
+	let dt = DateTime::parse_from_str(&date, "%Y/%m/%d %H:%M:%S %z").expect("Invalid date");
 	(dt + Duration::days(adj)).format("%Y/%m/%d").to_string()
 }
 
@@ -88,8 +87,7 @@ fn main() {
     let mut f: File = File::create("pricefile.txt").expect("Can't open output file!");
     let mut rdr = csv::Reader::from_file("../../produce.csv").expect("Can't open input file!");
     for record in rdr.decode() {
-        let record: ProduceRecord = record.unwrap();
-        let output = process_produce(record);
+        let output = process_produce(record.unwrap());
         if output.len() > 0 { 
         	f.write(output.as_bytes()).expect("Error writing output"); 
         }
