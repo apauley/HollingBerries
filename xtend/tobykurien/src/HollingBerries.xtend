@@ -18,17 +18,16 @@ import static extension com.google.common.io.CharStreams.*
 @Data class ProduceData {
     IntegerRange codes
     double markup
-    int shelfLifeDays
+    long shelfLife
 }
 
-// Main class
 class HollingBerries {
-    // Data for each type of produce: code range, markup, shelf life in days
+    // Data for each type of produce:  code range, markup, shelf life
     val produceData = #{
-        "Apples"  -> new ProduceData((1100 .. 1199), 1.40, 14),
-        "Bananas" -> new ProduceData((1200 .. 1299), 1.35, 5),
-        "Berries" -> new ProduceData((1300 .. 1399), 1.55, 7),
-        "Other"   -> new ProduceData(null          , 1.50, 7)
+        "Apples"  -> new ProduceData((1100 .. 1199), 1.40, 14.days),
+        "Bananas" -> new ProduceData((1200 .. 1299), 1.35, 5.days),
+        "Berries" -> new ProduceData((1300 .. 1399), 1.55, 7.days),
+        "Other"   -> new ProduceData(null          , 1.50, 7.days)
     }
 
     // supplier ratings
@@ -37,11 +36,15 @@ class HollingBerries {
 
     val inDateFormat = new SimpleDateFormat("\"yyyy/MM/dd\"")
     val outDateFormat = new SimpleDateFormat("yyyy/MM/dd")
-        
+
+    // Returns the produce data (markup, shelf life) for the specified product        
     def getProduceData(Product p) {
         produceData.values.findFirst[ codes == null || codes.contains(p.productCode) ]
     }
-        
+
+    // allow code like 3.days -> converts to Java standard of milliseconds    
+    def long days(int d) { d * 1000 * 60 * 60 * 24 }
+    
     // compute the selling price based on product type and supplier
     def getSellPrice(Product p) {
         var markup = p.produceData.markup
@@ -59,14 +62,14 @@ class HollingBerries {
 
     // compute sell by date based on product type and supplier
     def getSellBy(Product p) {
-        var adj = p.produceData.shelfLifeDays
+        var adj = p.produceData.shelfLife
 
         // adjust for suppliers
         if (troubleSuppliers.contains(p.supplierId)) {
-            adj = adj - 3
+            adj = adj - 3.days
         }
 
-        new Date(p.deliveryDate.time + adj * 1000 * 60 * 60 * 24)
+        new Date(p.deliveryDate.time + adj)
     }
 
     // generate the label printer lines for each product
