@@ -27,7 +27,7 @@ We use the following fields:
 
 *   Supplier ID.
 
-    All suppliers are equal, but some are more equal than others.
+    All suppliers are equal, but [some are more equal than others](https://en.wikiquote.org/wiki/Animal_Farm).
 
 *   Product code.
 
@@ -60,7 +60,7 @@ limited space (50 characters) for each price tag. Each line in the price file wi
 cause one price tag to be printed.
 
 The selling price takes up 9 characters. One currency symbol (R), 5
-digits before the decimal (a dot) and 2 digits afer the decimal.
+digits before the decimal (a dot) and 2 digits after the decimal.
 Like this: R99999.99
 
 Mr Hollingberry says we shouldn't worry about larger amounts. If he
@@ -104,9 +104,10 @@ delivery.
 One of the suppliers, Susan Windler (Supplier ID 32), has been known to deliver
 fruit that is not quite as fresh as that of the other suppliers.
 Mr. Hollingberry has decided to handle this quietly, by:
-*   ensuring that the sell-by date for anything delivered by Susan is always 3
-    days earlier than normal.
-*   making the price R2 less than usual.
+
+* ensuring that the sell-by date for anything delivered by Susan is always 3
+  days earlier than normal.
+* making the price R2 less than usual.
 
 Come to think of it, Togetherness Tshabalala (Supplier ID 101), also
 needs to be on this list.
@@ -128,8 +129,9 @@ If a product costs R25.11 after the extra 10% markup has
 been applied, you need to round it up to R26.
 
 The Premium Produce suppliers currently are:
-*   Promise Mashangu (Supplier ID 219)
-*   Karel Visser (Supplier ID 204)
+
+* Promise Mashangu (Supplier ID 219)
+* Karel Visser (Supplier ID 204)
 
 How do I contribute my solution?
 ================================
