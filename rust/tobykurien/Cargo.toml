@@ -1,0 +1,12 @@
+[package]
+name = "holling_berries"
+version = "0.0.1"
+authors = [ "Toby Kurien" ]
+
+[[bin]]
+name = "holling_berries"
+
+[dependencies]
+csv = "0.14"
+rustc-serialize = "0.3.19"
+chrono = "0.2"
